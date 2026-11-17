@@ -10,7 +10,10 @@
     "lint": "oxlint",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "api:fetch": "node scripts/fetch-openapi.mjs",
+    "api:generate": "npx --yes openapi-typescript@7.13.0 openapi.json --output src/api/schema.d.ts",
+    "api:update": "npm run api:fetch && npm run api:generate"
   },
   "dependencies": {
     "openapi-fetch": "^0.17.0",

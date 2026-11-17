@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# L'area giocatore non va indicizzata
+Disallow: /app
+Disallow: /app.html
+
+# TODO: sostituire con il dominio reale quando esisterà la sitemap
+# Sitemap: https://www.example.com/sitemap.xml

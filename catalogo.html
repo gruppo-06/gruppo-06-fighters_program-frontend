@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Catalogo carte – Fighters Program</title>
+    <meta
+      name="description"
+      content="Sfoglia il catalogo completo delle carte di Fighters Program: fazioni, rarità, costi e statistiche."
+    />
+    <link rel="canonical" href="https://www.example.com/catalogo.html" />
+
+    <!-- Open Graph (TODO: sostituire example.com con il dominio reale) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Fighters Program" />
+    <meta property="og:locale" content="it_IT" />
+    <meta property="og:title" content="Catalogo carte – Fighters Program" />
+    <meta
+      property="og:description"
+      content="Sfoglia il catalogo completo delle carte di Fighters Program: fazioni, rarità, costi e statistiche."
+    />
+    <meta property="og:url" content="https://www.example.com/catalogo.html" />
+    <meta property="og:image" content="https://www.example.com/images/og-default.png" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600&family=Teko:wght@600&display=swap"
+    />
+    <link rel="stylesheet" href="/src/styles/main.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#contenuto">Vai al contenuto</a>
+
+    <header class="site-header">
+      <div class="container site-header__inner">
+        <a class="site-logo" href="/">Fighters Program</a>
+        <a class="button" href="/app/login">Gioca</a>
+        <nav class="site-nav" aria-label="Navigazione principale">
+          <ul role="list">
+            <li><a href="/">Home</a></li>
+            <li><a href="/gioco.html">Il gioco</a></li>
+            <li><a href="/regolamento.html">Regolamento</a></li>
+            <li><a href="/fazioni.html">Fazioni</a></li>
+            <li><a href="/catalogo.html" aria-current="page">Catalogo</a></li>
+            <li><a href="/news.html">News</a></li>
+            <li><a href="/faq.html">FAQ</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main id="contenuto" class="container">
+      <header class="page-intro">
+        <h1>Catalogo carte</h1>
+        <p>Tutte le carte disponibili nel gioco.</p>
+      </header>
+
+      <section aria-labelledby="catalogo-elenco">
+        <h2 id="catalogo-elenco" class="visually-hidden">Elenco carte</h2>
+        <!-- Isola React: montata da src/pages/catalogo.jsx -->
+        <div id="catalogo-root">
+          <noscript>Attiva JavaScript per sfogliare il catalogo delle carte.</noscript>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <ul role="list">
+          <li><a href="/contatti.html">Contatti</a></li>
+          <li><a href="/privacy.html">Privacy</a></li>
+        </ul>
+        <p>&copy; 2026 Fighters Program</p>
+      </div>
+    </footer>
+
+    <script type="module" src="/src/pages/catalogo.jsx"></script>
+  </body>
+</html>

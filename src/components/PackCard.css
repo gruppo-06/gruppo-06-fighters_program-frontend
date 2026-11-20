@@ -1,0 +1,64 @@
+.pack-card {
+  --cut: var(--cut-md);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--color-background-surface);
+  border: 1px solid var(--color-border-default);
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - var(--cut)),
+    calc(100% - var(--cut)) 100%,
+    0 100%
+  );
+}
+
+.pack-card__image {
+  display: block;
+  /* Copre il bordo della card in alto e ai lati */
+  margin: -1px -1px 0;
+  height: 17.5rem; /* 280px */
+  object-fit: cover;
+}
+
+.pack-card__image--placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-background-placeholder);
+  border: 1px dashed var(--color-border-strong);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.45;
+}
+
+.pack-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--space-4) var(--space-5) var(--space-5);
+}
+
+.pack-card__title {
+  font-size: var(--font-size-xl);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+/* (p + p di base.css aggiungerebbe margine: qui gestiamo noi gli spazi) */
+.pack-card__description {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.45;
+}
+
+.pack-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-top: 10px;
+}

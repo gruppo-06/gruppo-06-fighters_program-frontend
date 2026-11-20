@@ -1,0 +1,180 @@
+/* Pagina Negozio (Figma: NEGOZIO). Mobile-first. */
+
+.shop {
+  /* Nel mockup il contenuto è largo 1200px (più il padding laterale del container) */
+  --container-max: calc(75rem + 2 * var(--space-4));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-10);
+  padding-block: var(--space-10) var(--space-16);
+}
+
+/* Spaziature gestite con gap: annulliamo quelle generiche di base.css */
+.shop p {
+  margin: 0;
+}
+
+.shop section + section {
+  margin-top: 0;
+}
+
+/* ---------- Intestazione ---------- */
+.shop-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-6);
+}
+
+.shop-header__title {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.shop-header__title h1 {
+  font-size: var(--font-size-4xl);
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+
+.shop-balance {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-background-surface);
+  border: 1px solid var(--color-border-default);
+}
+
+.shop-balance__label {
+  color: var(--color-text-muted);
+  font-size: 0.6875rem; /* 11px Label/Stat */
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ---------- Pacchetto in evidenza ---------- */
+.shop-featured {
+  --cut: var(--cut-lg);
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 14px;
+  min-height: 28.75rem; /* 460px */
+  padding: var(--space-10) var(--space-6) var(--space-8);
+  overflow: hidden;
+  background: var(--color-background-placeholder);
+  border: 1px dashed var(--color-border-strong);
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - var(--cut)),
+    calc(100% - var(--cut)) 100%,
+    0 100%
+  );
+}
+
+/* Sfumatura da sinistra per la leggibilità del testo */
+.shop-featured::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--color-background-page) 95%, transparent) 0%,
+    color-mix(in srgb, var(--color-background-page) 60%, transparent) 50%,
+    color-mix(in srgb, var(--color-background-page) 5%, transparent) 85%
+  );
+}
+
+.shop-featured__image {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.shop-featured__placeholder-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: -2;
+  translate: -50% -50%;
+  color: var(--color-text-muted);
+}
+
+.shop-featured__title {
+  font-size: var(--font-size-4xl);
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+
+.shop-featured__description {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-body);
+}
+
+.shop-featured__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-6);
+  padding-top: 6px;
+}
+
+/* ---------- Catalogo ---------- */
+.shop-catalog {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-10);
+}
+
+.shop-catalog__grid {
+  display: grid;
+  gap: var(--space-6);
+}
+
+@media (min-width: 48rem) {
+  .shop-catalog__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 64rem) {
+  .shop {
+    padding-block: var(--space-14) var(--space-24);
+  }
+
+  .shop-header {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  .shop-header__title h1,
+  .shop-featured__title {
+    font-size: var(--font-size-6xl);
+  }
+
+  .shop-featured {
+    padding: var(--space-10) var(--space-12) 44px;
+  }
+
+  .shop-featured__description {
+    font-size: 1.1875rem; /* 19px Body/L */
+  }
+
+  .shop-catalog__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

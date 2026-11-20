@@ -1,0 +1,1781 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Fighters Program API",
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Generated server url"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/api/me/decks/{deckId}": {
+      "get": {
+        "tags": [
+          "Decks"
+        ],
+        "summary": "A deck of the current user with its cards",
+        "operationId": "get",
+        "parameters": [
+          {
+            "name": "deckId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeckDetail"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Decks"
+        ],
+        "summary": "Replace name and cards of a deck; 422 with the violations if it breaks the rules",
+        "operationId": "update",
+        "parameters": [
+          {
+            "name": "deckId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeckRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeckDetail"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Decks"
+        ],
+        "summary": "Delete a deck that is not waiting in a challenge",
+        "operationId": "delete",
+        "parameters": [
+          {
+            "name": "deckId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/api/me/decks": {
+      "get": {
+        "tags": [
+          "Decks"
+        ],
+        "summary": "Decks of the current user",
+        "operationId": "list",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DeckSummary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Decks"
+        ],
+        "summary": "Save a new deck; 422 with the violations if it breaks the rules",
+        "operationId": "create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeckRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeckDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/me/decks/validate": {
+      "post": {
+        "tags": [
+          "Decks"
+        ],
+        "summary": "Check a deck against the rules without saving it",
+        "operationId": "validate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeckContents"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeckValidationResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/matches": {
+      "post": {
+        "tags": [
+          "Matches"
+        ],
+        "summary": "Challenge another player with one of your decks",
+        "operationId": "challenge",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMatchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchListItem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/matches/{matchId}/decline": {
+      "post": {
+        "tags": [
+          "Matches"
+        ],
+        "summary": "Decline a challenge you received",
+        "operationId": "decline",
+        "parameters": [
+          {
+            "name": "matchId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchListItem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/matches/{matchId}/cancel": {
+      "post": {
+        "tags": [
+          "Matches"
+        ],
+        "summary": "Cancel a challenge you sent",
+        "operationId": "cancel",
+        "parameters": [
+          {
+            "name": "matchId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchListItem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/matches/{matchId}/accept": {
+      "post": {
+        "tags": [
+          "Matches"
+        ],
+        "summary": "Accept with one of your decks: the server shuffles, plays and stores the match",
+        "operationId": "accept",
+        "parameters": [
+          {
+            "name": "matchId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptMatchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchReplay"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Register a new player",
+        "operationId": "register",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfile"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Exchange email and password for a bearer token",
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/me": {
+      "get": {
+        "tags": [
+          "Profile"
+        ],
+        "summary": "Profile of the authenticated user",
+        "operationId": "me",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfile"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/me/collection": {
+      "get": {
+        "tags": [
+          "Collection"
+        ],
+        "summary": "Cards owned by the current user, optionally filtered by faction, class and rarity",
+        "operationId": "list_1",
+        "parameters": [
+          {
+            "name": "faction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "class",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "rarity",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponseCollectionEntry"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/me/collection/progress": {
+      "get": {
+        "tags": [
+          "Collection"
+        ],
+        "summary": "Distinct cards owned per faction, against the catalog total",
+        "operationId": "progress",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FactionProgress"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/matches/{matchId}": {
+      "get": {
+        "tags": [
+          "Matches"
+        ],
+        "summary": "A challenge you take part in; finished ones include decks and the turn-by-turn log",
+        "operationId": "replay",
+        "parameters": [
+          {
+            "name": "matchId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchReplay"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/matches/outgoing": {
+      "get": {
+        "tags": [
+          "Matches"
+        ],
+        "summary": "Challenges you sent, in any state",
+        "operationId": "outgoing",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MatchListItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/matches/incoming": {
+      "get": {
+        "tags": [
+          "Matches"
+        ],
+        "summary": "Challenges waiting for your answer",
+        "operationId": "incoming",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MatchListItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/matches/history": {
+      "get": {
+        "tags": [
+          "Matches"
+        ],
+        "summary": "Your finished matches, newest first, with your result",
+        "operationId": "history",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponseMatchHistoryItem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/cards": {
+      "get": {
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "List cards, optionally filtered by faction, class and rarity",
+        "operationId": "list_2",
+        "parameters": [
+          {
+            "name": "faction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "class",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "rarity",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponseCardResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/cards/{code}": {
+      "get": {
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Get a card by its code, e.g. EA01",
+        "operationId": "get_1",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CardResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "DeckEntry": {
+        "type": "object",
+        "properties": {
+          "cardId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "copies": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "cardId",
+          "copies"
+        ]
+      },
+      "DeckRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 0
+          },
+          "cards": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DeckEntry"
+            },
+            "maxItems": 100,
+            "minItems": 0
+          }
+        },
+        "required": [
+          "cards",
+          "name"
+        ]
+      },
+      "DeckCardView": {
+        "type": "object",
+        "properties": {
+          "cardId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "faction": {
+            "type": "string"
+          },
+          "fighterClass": {
+            "type": "string"
+          },
+          "rarity": {
+            "type": "string"
+          },
+          "atk": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "def": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "imageFile": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "copies": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "required": [
+          "atk",
+          "cardId",
+          "code",
+          "copies",
+          "def",
+          "faction",
+          "fighterClass",
+          "imageFile",
+          "name",
+          "rarity"
+        ]
+      },
+      "DeckDetail": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "cards": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DeckCardView"
+            }
+          }
+        },
+        "required": [
+          "cards",
+          "createdAt",
+          "id",
+          "name"
+        ]
+      },
+      "DeckContents": {
+        "type": "object",
+        "properties": {
+          "cards": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DeckEntry"
+            },
+            "maxItems": 100,
+            "minItems": 0
+          }
+        },
+        "required": [
+          "cards"
+        ]
+      },
+      "DeckValidationResult": {
+        "type": "object",
+        "properties": {
+          "valid": {
+            "type": "boolean"
+          },
+          "violations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Violation"
+            }
+          }
+        },
+        "required": [
+          "valid",
+          "violations"
+        ]
+      },
+      "Violation": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ]
+      },
+      "CreateMatchRequest": {
+        "type": "object",
+        "properties": {
+          "opponentNickname": {
+            "type": "string",
+            "minLength": 1
+          },
+          "deckId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "required": [
+          "deckId",
+          "opponentNickname"
+        ]
+      },
+      "MatchListItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "challengerNickname": {
+            "type": "string"
+          },
+          "opponentNickname": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "challengerNickname",
+          "createdAt",
+          "id",
+          "opponentNickname",
+          "status"
+        ]
+      },
+      "AcceptMatchRequest": {
+        "type": "object",
+        "properties": {
+          "deckId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "required": [
+          "deckId"
+        ]
+      },
+      "CardRef": {
+        "type": "object",
+        "properties": {
+          "deckPosition": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "deckPosition",
+          "name"
+        ]
+      },
+      "CardSummary": {
+        "type": "object",
+        "properties": {
+          "player": {
+            "type": "string",
+            "enum": [
+              "ONE",
+              "TWO"
+            ]
+          },
+          "deckPosition": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cardCode": {
+            "type": "string"
+          },
+          "enteredOnTurn": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "roundsPlayed": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "damageDealt": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "damageTaken": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "knockouts": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "required": [
+          "cardCode",
+          "damageDealt",
+          "damageTaken",
+          "deckPosition",
+          "enteredOnTurn",
+          "knockouts",
+          "player",
+          "roundsPlayed"
+        ]
+      },
+      "FighterLog": {
+        "type": "object",
+        "properties": {
+          "deckPosition": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cardCode": {
+            "type": "string"
+          },
+          "cardName": {
+            "type": "string"
+          },
+          "faction": {
+            "type": "string",
+            "enum": [
+              "EURO_ATLANTIC",
+              "EURASIAN",
+              "AFRICAN",
+              "PAN_AMERICAN",
+              "INDO_PACIFIC"
+            ]
+          },
+          "hasFactionAdvantage": {
+            "type": "boolean"
+          },
+          "printedAttack": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "effectiveAttack": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "damageDealt": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "defenseBefore": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "defenseAfter": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "required": [
+          "cardCode",
+          "cardName",
+          "damageDealt",
+          "deckPosition",
+          "defenseAfter",
+          "defenseBefore",
+          "effectiveAttack",
+          "faction",
+          "hasFactionAdvantage",
+          "printedAttack"
+        ]
+      },
+      "MatchLog": {
+        "type": "object",
+        "properties": {
+          "seed": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "BASE"
+            ]
+          },
+          "rulesVersion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "deckOneOrder": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "deckTwoOrder": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "turns": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TurnLog"
+            }
+          },
+          "summary": {
+            "$ref": "#/components/schemas/MatchSummary"
+          }
+        },
+        "required": [
+          "deckOneOrder",
+          "deckTwoOrder",
+          "mode",
+          "rulesVersion",
+          "seed",
+          "summary",
+          "turns"
+        ]
+      },
+      "MatchReplay": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "status": {
+            "type": "string"
+          },
+          "challengerNickname": {
+            "type": "string"
+          },
+          "opponentNickname": {
+            "type": "string"
+          },
+          "winnerNickname": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "finishedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "challengerDeck": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/SnapshotCard"
+            }
+          },
+          "opponentDeck": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/SnapshotCard"
+            }
+          },
+          "log": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MatchLog"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "challengerDeck",
+          "challengerNickname",
+          "createdAt",
+          "finishedAt",
+          "id",
+          "log",
+          "opponentDeck",
+          "opponentNickname",
+          "status",
+          "winnerNickname"
+        ]
+      },
+      "MatchSummary": {
+        "type": "object",
+        "properties": {
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "PLAYER_ONE_WINS",
+              "PLAYER_TWO_WINS",
+              "DRAW"
+            ]
+          },
+          "endReason": {
+            "type": "string",
+            "enum": [
+              "HEALTH_DEPLETED",
+              "DECK_EXHAUSTED",
+              "TURN_LIMIT"
+            ]
+          },
+          "totalTurns": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cards": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CardSummary"
+            }
+          }
+        },
+        "required": [
+          "cards",
+          "endReason",
+          "outcome",
+          "totalTurns"
+        ]
+      },
+      "SnapshotCard": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "faction": {
+            "type": "string"
+          },
+          "rarity": {
+            "type": "string"
+          },
+          "atk": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "def": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "required": [
+          "atk",
+          "code",
+          "def",
+          "faction",
+          "name",
+          "rarity"
+        ]
+      },
+      "TurnLog": {
+        "type": "object",
+        "properties": {
+          "turnNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "roundNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fighterOne": {
+            "$ref": "#/components/schemas/FighterLog"
+          },
+          "fighterTwo": {
+            "$ref": "#/components/schemas/FighterLog"
+          },
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "NO_KNOCKOUT",
+              "FIRST_KNOCKED_OUT",
+              "SECOND_KNOCKED_OUT",
+              "DOUBLE_KNOCKOUT"
+            ]
+          },
+          "healthDamage": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "healthOneAfter": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "healthTwoAfter": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "replacementOne": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CardRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "replacementTwo": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CardRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "narration": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "fighterOne",
+          "fighterTwo",
+          "healthDamage",
+          "healthOneAfter",
+          "healthTwoAfter",
+          "narration",
+          "outcome",
+          "replacementOne",
+          "replacementTwo",
+          "roundNumber",
+          "turnNumber"
+        ]
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "properties": {
+          "nickname": {
+            "type": "string",
+            "maxLength": 20,
+            "minLength": 3
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 72,
+            "minLength": 8
+          }
+        },
+        "required": [
+          "email",
+          "nickname",
+          "password"
+        ]
+      },
+      "UserProfile": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "id",
+          "nickname",
+          "role"
+        ]
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "minLength": 1
+          },
+          "password": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "TokenResponse": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "expiresIn": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "required": [
+          "accessToken",
+          "expiresIn"
+        ]
+      },
+      "DeckSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "cardCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "cardCount",
+          "createdAt",
+          "id",
+          "name"
+        ]
+      },
+      "CollectionEntry": {
+        "type": "object",
+        "properties": {
+          "cardId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "faction": {
+            "type": "string"
+          },
+          "fighterClass": {
+            "type": "string"
+          },
+          "rarity": {
+            "type": "string"
+          },
+          "atk": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "def": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "vel": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "crt": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "imageFile": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "required": [
+          "atk",
+          "cardId",
+          "code",
+          "crt",
+          "def",
+          "faction",
+          "fighterClass",
+          "imageFile",
+          "name",
+          "quantity",
+          "rarity",
+          "vel"
+        ]
+      },
+      "PageResponseCollectionEntry": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CollectionEntry"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "required": [
+          "content",
+          "page",
+          "size",
+          "totalElements",
+          "totalPages"
+        ]
+      },
+      "FactionProgress": {
+        "type": "object",
+        "properties": {
+          "faction": {
+            "type": "string"
+          },
+          "owned": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "required": [
+          "faction",
+          "owned",
+          "total"
+        ]
+      },
+      "MatchHistoryItem": {
+        "type": "object",
+        "properties": {
+          "matchId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "opponentNickname": {
+            "type": "string"
+          },
+          "result": {
+            "type": "string"
+          },
+          "finishedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "finishedAt",
+          "matchId",
+          "opponentNickname",
+          "result"
+        ]
+      },
+      "PageResponseMatchHistoryItem": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MatchHistoryItem"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "required": [
+          "content",
+          "page",
+          "size",
+          "totalElements",
+          "totalPages"
+        ]
+      },
+      "CardResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "country": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "faction": {
+            "type": "string"
+          },
+          "fighterClass": {
+            "type": "string"
+          },
+          "rarity": {
+            "type": "string"
+          },
+          "atk": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "def": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "vel": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "crt": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "flavorText": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "imageFile": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "atk",
+          "code",
+          "country",
+          "crt",
+          "def",
+          "faction",
+          "fighterClass",
+          "flavorText",
+          "imageFile",
+          "name",
+          "rarity",
+          "vel"
+        ]
+      },
+      "PageResponseCardResponse": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CardResponse"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "required": [
+          "content",
+          "page",
+          "size",
+          "totalElements",
+          "totalPages"
+        ]
+      },
+      "ApiError": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "details": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "code",
+          "details",
+          "message"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

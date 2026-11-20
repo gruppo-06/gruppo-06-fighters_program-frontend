@@ -1,0 +1,154 @@
+/*
+ * Carta fighter (Figma: FighterCard).
+ * Disegnata su una larghezza di 250px: 1cqi = 2.5px a quella misura.
+ */
+.fighter-card {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  aspect-ratio: 250 / 340;
+  overflow: hidden;
+  background: var(--color-background-surface);
+  border: 1.5px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+/* ---------- Illustrazione ---------- */
+.fighter-card__art {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: 1;
+  background: var(--color-background-placeholder);
+  border-bottom: 1px dashed var(--color-border-strong);
+}
+
+.fighter-card__art img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fighter-card__placeholder {
+  width: 9cqi;
+  height: 9cqi;
+  color: var(--color-text-muted);
+}
+
+.fighter-card__number,
+.fighter-card__element {
+  position: absolute;
+  left: 4cqi;
+  padding: 1.2cqi 2.4cqi;
+  background: var(--color-background-page);
+  color: var(--color-text-primary);
+  font-size: max(9px, 4cqi);
+  font-weight: 700;
+  line-height: var(--line-height-tight);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.fighter-card__number {
+  top: 4cqi;
+}
+
+.fighter-card__element {
+  bottom: 4cqi;
+  border: 1px solid var(--color-border-strong);
+}
+
+.fighter-card .fighter-card__rarity {
+  position: absolute;
+  top: 4cqi;
+  right: 4cqi;
+  padding: 1.2cqi 2.4cqi;
+  background: var(--color-background-page);
+  font-size: max(8px, 4.4cqi);
+}
+
+/* ---------- Dati ---------- */
+.fighter-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1cqi;
+  padding: 5cqi 5cqi 4cqi;
+}
+
+.fighter-card__meta,
+.fighter-card__subcards {
+  margin: 0;
+}
+
+.fighter-card__name {
+  font-size: 11cqi;
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+
+.fighter-card__meta {
+  color: var(--color-text-muted);
+  font-size: max(10px, 5.2cqi);
+  line-height: var(--line-height-tight);
+}
+
+.fighter-card__stats {
+  display: flex;
+  justify-content: space-between;
+  margin: 2cqi 0 0;
+}
+
+.fighter-card__stats div {
+  display: flex;
+  flex-direction: column;
+}
+
+.fighter-card__stats dt {
+  color: var(--color-text-secondary);
+  font-size: max(8px, 3.8cqi);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.fighter-card__stats abbr {
+  text-decoration: none;
+}
+
+.fighter-card__stats dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 10cqi;
+  line-height: 0.9;
+}
+
+.fighter-card__subcards {
+  display: flex;
+  align-items: center;
+  gap: 2cqi;
+  margin-top: 2cqi;
+  color: var(--color-text-secondary);
+  font-size: max(8px, 3.8cqi);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.fighter-card__slots {
+  display: flex;
+  gap: 1.6cqi;
+}
+
+.fighter-card__slots span {
+  width: 4cqi;
+  height: 4cqi;
+  border: 1px solid var(--color-border-strong);
+}
+
+.fighter-card__slots .is-filled {
+  background: var(--color-accent-highlight);
+  border-color: var(--color-accent-highlight);
+}

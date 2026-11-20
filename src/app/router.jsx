@@ -10,9 +10,12 @@ import { createBrowserRouter } from 'react-router-dom';
 import AppLayout from './layout/AppLayout.jsx';
 import Negozio from './routes/Negozio.jsx';
 import NotFound from './routes/NotFound.jsx';
+import Partita from './routes/Partita.jsx';
 
 export const router = createBrowserRouter(
   [
+    // Partita: schermata a tutta pagina, fuori da AppLayout (niente navbar)
+    { path: '/partita', element: <Partita /> },
     {
       path: '/',
       element: <AppLayout />,

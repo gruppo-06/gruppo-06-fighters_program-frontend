@@ -37,7 +37,7 @@ export default function AppLayout() {
             </ul>
           </nav>
           <div className="site-header__actions">
-            <Link className="button" to="/sfide">
+            <Link className="button" to="/partita">
               <Icon name="play" size={14} />
               Gioca
             </Link>

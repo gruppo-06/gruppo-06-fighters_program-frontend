@@ -8,16 +8,21 @@
  */
 import { createBrowserRouter } from 'react-router-dom';
 import AppLayout from './layout/AppLayout.jsx';
+import Negozio from './routes/Negozio.jsx';
 import NotFound from './routes/NotFound.jsx';
+import Partita from './routes/Partita.jsx';
 
 export const router = createBrowserRouter(
   [
+    // Partita: schermata a tutta pagina, fuori da AppLayout (niente navbar)
+    { path: '/partita', element: <Partita /> },
     {
       path: '/',
       element: <AppLayout />,
       children: [
         // TODO: aggiungere qui le rotte dell'area giocatore man mano che vengono implementate
-        // (login, registrazione, dashboard, negozio, collezione, mazzi, scambi, sfide, trofei, …)
+        // (login, registrazione, dashboard, collezione, mazzi, scambi, sfide, trofei, …)
+        { path: 'negozio', element: <Negozio /> },
         { path: '*', element: <NotFound /> },
       ],
     },

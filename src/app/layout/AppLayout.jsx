@@ -1,31 +1,33 @@
-import { NavLink, Outlet } from 'react-router-dom';
+import { Link, NavLink, Outlet } from 'react-router-dom';
+import Icon from '../../components/Icon.jsx';
+import UserMenu from '../../components/UserMenu.jsx';
 import './AppLayout.css';
 
 const NAV_LINKS = [
-  { to: '/dashboard', label: 'Dashboard' },
   { to: '/negozio', label: 'Negozio' },
   { to: '/collezione', label: 'Collezione' },
   { to: '/mazzi', label: 'Mazzi' },
   { to: '/scambi', label: 'Scambi' },
   { to: '/sfide', label: 'Sfide' },
-  { to: '/profilo', label: 'Profilo' },
-  { to: '/impostazioni', label: 'Impostazioni' },
+  { to: '/trofei', label: 'Trofei' },
 ];
 
-/** Layout comune dell'area giocatore: navbar + contenuto della rotta attiva. */
+/**
+ * Layout comune dell'area giocatore (Figma: Navbar) + contenuto della rotta attiva.
+ * Riusa gli stili .site-header / .site-nav del sito pubblico (src/styles/base.css):
+ * NavLink imposta aria-current="page" sul link attivo, che accende l'indicatore.
+ * Ogni rotta gestisce da sé il proprio .container e le spaziature verticali.
+ */
 export default function AppLayout() {
   return (
     <>
-      <header className="app-header">
-        <div className="container app-header__inner">
+      <header className="site-header">
+        <div className="site-header__inner">
           {/* <a> normale (non <Link>): il sito pubblico è fuori dalla SPA */}
           <a className="site-logo" href="/">
-            Fighters Program
+            <img src="/images/logo.webp" alt="Fighters Program – Home" width="144" height="48" />
           </a>
-          <NavLink className="app-header__login" to="/login">
-            Accedi
-          </NavLink>
-          <nav className="app-nav" aria-label="Area giocatore">
+          <nav className="site-nav" aria-label="Area giocatore">
             <ul role="list">
               {NAV_LINKS.map(({ to, label }) => (
                 <li key={to}>
@@ -34,10 +36,17 @@ export default function AppLayout() {
               ))}
             </ul>
           </nav>
+          <div className="site-header__actions">
+            <Link className="button" to="/partita">
+              <Icon name="play" size={14} />
+              Gioca
+            </Link>
+            <UserMenu />
+          </div>
         </div>
       </header>
 
-      <main className="container app-main">
+      <main className="app-main">
         <Outlet />
       </main>
     </>

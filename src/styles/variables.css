@@ -1,0 +1,92 @@
+:root {
+  /* Sfondi */
+  --color-background-page: #16171d;
+  --color-background-nav: #121318;
+  --color-background-surface: #1d1e26;
+  --color-background-surface-sunken: #14151b;
+  --color-background-placeholder: #252733;
+
+  /* Bordi */
+  --color-border-default: #2d2f39;
+  --color-border-strong: #4a4c57;
+
+  /* Testo */
+  --color-text-primary: #f1f1ef;
+  --color-text-secondary: #d0d4d7;
+  --color-text-muted: #a7a4a1;
+
+  /* Accenti */
+  --color-accent-primary: #9f4137;
+  --color-accent-primary-hover: #b24a41;
+  --color-accent-primary-pressed: #7e3229;
+  --color-accent-primary-light: #c2574f;
+  --color-accent-primary-dark: #6b2a24;
+  --color-accent-highlight: #ee8b7d;
+  --color-accent-link: #c4984f;
+
+  /* Rarità */
+  --color-rarity-comune: #9ea3ad;
+  --color-rarity-rara: #7cc4a0;
+  --color-rarity-epica: #e7a15f;
+  --color-rarity-leggendaria: #9b7be0;
+
+  /* Font */
+  --font-display: 'Teko', sans-serif;
+  --font-body: 'Rajdhani', sans-serif;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.75rem;
+  --font-size-2xl: 2.25rem;
+  --line-height: 1.6;
+
+  /* Font – aggiunti per la home (scala tipografica di Figma) */
+  --font-size-xs: 0.75rem; /* 12px  Eyebrow */
+  --font-size-md: 1.125rem; /* 18px  Label/Button L */
+  --font-size-3xl: 2.375rem; /* 38px  Heading/H3 */
+  --font-size-4xl: 3rem; /* 48px  Stat/Value */
+  --font-size-5xl: 3.75rem; /* 60px  Heading/H2 */
+  --font-size-6xl: 4.5rem; /* 72px  Heading/H1 */
+  --font-size-display: 7.5rem; /* 120px Display/XL */
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --line-height-display: 0.92;
+  --line-height-tight: 1.2;
+  --line-height-body: 1.5;
+  --letter-spacing-eyebrow: 0.16em;
+
+  /* Spaziature */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+
+  /* Spaziature – aggiunte per la home */
+  --space-5: 1.25rem; /* 20px */
+  --space-7: 1.75rem; /* 28px */
+  --space-10: 2.5rem; /* 40px */
+  --space-14: 3.5rem; /* 56px */
+  --space-16: 4rem; /* 64px */
+  --space-20: 5rem; /* 80px */
+  --space-24: 6rem; /* 96px */
+  --space-30: 7.5rem; /* 120px */
+
+  /* Angolo tagliato (in basso a destra) di bottoni e card */
+  --cut-sm: 8px;
+  --cut-md: 14px;
+  --cut-lg: 18px;
+
+  /* Forme, ombre, animazioni */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --shadow-md: 0 4px 16px rgb(0 0 0 / 35%);
+  --transition: 0.15s ease;
+
+  /* Layout */
+  --container-max: 72rem;
+  --header-height: 3.5rem;
+}

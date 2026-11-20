@@ -1,0 +1,20 @@
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.user-menu__profile {
+  border-radius: 50%;
+}
+
+/* Su schermi piccoli i crediti si nascondono per lasciare spazio */
+.user-menu .credits-pill {
+  display: none;
+}
+
+@media (min-width: 30rem) {
+  .user-menu .credits-pill {
+    display: inline-flex;
+  }
+}

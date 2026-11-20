@@ -1,0 +1,6 @@
+/* Icona SVG inline (componente <Icon />). Il colore arriva da `color`. */
+.svg-icon {
+  display: inline-block;
+  flex-shrink: 0;
+  vertical-align: middle;
+}

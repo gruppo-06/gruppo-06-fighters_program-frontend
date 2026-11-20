@@ -1,0 +1,442 @@
+/*
+ * Stili specifici della home (index.html). Mobile-first.
+ * I componenti riutilizzabili (bottoni, section-header, step-card, …)
+ * stanno in src/styles/components/.
+ */
+
+/* Le sezioni della home gestiscono da sole le proprie spaziature */
+.home {
+  padding-block: 0;
+}
+
+.home > section + section {
+  margin-top: 0;
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: flex-end;
+  min-height: 40rem;
+  padding-block: var(--space-24) var(--space-12);
+  overflow: hidden;
+  background: var(--color-background-placeholder);
+}
+
+.hero__image {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+/* Sfumatura da sinistra (leggibilità del testo) e verso il basso (stacco con la pagina) */
+.hero::before,
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
+.hero::before {
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--color-background-page) 95%, transparent) 0%,
+    color-mix(in srgb, var(--color-background-page) 70%, transparent) 45%,
+    color-mix(in srgb, var(--color-background-page) 10%, transparent) 80%
+  );
+}
+
+.hero::after {
+  background: linear-gradient(to bottom, transparent 53%, var(--color-background-page));
+}
+
+.hero__content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-5);
+}
+
+.hero__title {
+  font-size: var(--font-size-5xl);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.hero__title span {
+  display: block;
+}
+
+.hero__title-accent {
+  color: var(--color-accent-highlight);
+}
+
+.hero__lead {
+  max-width: 35rem;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-body);
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+/* Numeri (Figma: HeroStat). <dt> = etichetta, <dd> = valore, mostrati al contrario */
+.hero__stats {
+  display: flex;
+  gap: var(--space-8);
+  padding-top: var(--space-4);
+}
+
+.hero-stat {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 2px;
+}
+
+.hero-stat__value {
+  font-family: var(--font-display);
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: 0.9;
+}
+
+.hero-stat__label {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.45;
+}
+
+/* ---------- Nuovi fighter (ventaglio di carte) ---------- */
+.home-fighters {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  padding-block: var(--space-16) var(--space-16);
+  overflow: hidden;
+}
+
+/*
+ * Il ventaglio è disegnato a 1606×500px (Figma) e si scala con --fan-scale.
+ * Ogni carta riceve via HTML la posizione orizzontale (--x) e la rotazione (--r).
+ */
+.card-fan {
+  --fan-scale: 0.5;
+  position: relative;
+  width: 100%;
+  height: calc(500px * var(--fan-scale));
+}
+
+.fan-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 256px;
+  aspect-ratio: 256 / 341;
+  transform: translate(-50%, -50%) translateX(calc(var(--x) * var(--fan-scale))) rotate(var(--r))
+    scale(var(--fan-scale));
+}
+
+/* Le carte centrali stanno sopra quelle esterne */
+.fan-card:nth-child(1),
+.fan-card:nth-child(7) {
+  z-index: 1;
+}
+
+.fan-card:nth-child(2),
+.fan-card:nth-child(6) {
+  z-index: 2;
+}
+
+.fan-card:nth-child(3),
+.fan-card:nth-child(5) {
+  z-index: 3;
+}
+
+.fan-card:nth-child(4) {
+  z-index: 4;
+}
+
+/* Strati della carta: illustrazione, cornice di rarità, simbolo di fazione */
+.fan-card img {
+  position: absolute;
+}
+
+.fan-card__art {
+  top: 17.9%;
+  left: 7.81%;
+  width: 84.38%;
+  aspect-ratio: 1402 / 1122;
+  object-fit: cover;
+}
+
+.fan-card__frame {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.fan-card__faction {
+  top: 8.8%;
+  left: 11.72%;
+  width: 9.77%;
+}
+
+/* ---------- Come funziona ---------- */
+.home-steps,
+.home-factions {
+  padding-block: var(--space-16);
+}
+
+.home-steps .container,
+.home-factions .container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.step-grids {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.step-grid {
+  display: grid;
+  gap: var(--space-5);
+}
+
+/* ---------- Fazioni ---------- */
+.home-factions__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.home-factions__intro {
+  max-width: 17.5rem;
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-body);
+}
+
+/* Su mobile le fazioni scorrono in orizzontale */
+.faction-list {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(10rem, 45%);
+  gap: var(--space-5);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: var(--space-2);
+}
+
+.faction-list li {
+  scroll-snap-align: start;
+}
+
+/* ---------- Teaser trofei ---------- */
+.home-trophies {
+  padding-block: var(--space-10);
+}
+
+.trophy-panel {
+  --cut: var(--cut-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-10);
+  padding: var(--space-8) var(--space-6);
+  background: var(--color-background-surface);
+  border: 1px solid var(--color-border-default);
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - var(--cut)),
+    calc(100% - var(--cut)) 100%,
+    0 100%
+  );
+}
+
+.trophy-panel__text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.trophy-panel__title {
+  max-width: 31.25rem;
+}
+
+.trophy-panel__lead {
+  max-width: 30rem;
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-body);
+}
+
+.trophy-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-8);
+}
+
+/* ---------- CTA finale ---------- */
+.home-cta {
+  padding-block: var(--space-10) var(--space-24);
+}
+
+.cta-panel {
+  --cut: var(--cut-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  min-height: 27.5rem;
+  padding: var(--space-12) var(--space-6);
+  text-align: center;
+  border: 1px solid var(--color-border-default);
+  background:
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--color-background-page) 35%, transparent),
+      color-mix(in srgb, var(--color-background-page) 95%, transparent)
+    ),
+    var(--color-background-placeholder);
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - var(--cut)),
+    calc(100% - var(--cut)) 100%,
+    0 100%
+  );
+}
+
+.cta-panel__title {
+  font-size: var(--font-size-4xl);
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+
+.cta-panel__lead {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-body);
+  text-wrap: balance;
+}
+
+.cta-panel__lead .icon {
+  --icon-size: 1em;
+  vertical-align: -0.125em;
+}
+
+.cta-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
+  padding-top: var(--space-2);
+}
+
+/* ---------- Tablet ---------- */
+@media (min-width: 48rem) {
+  .hero {
+    min-height: 48.75rem;
+    padding-block: var(--space-30) var(--space-16);
+  }
+
+  .hero__title {
+    font-size: var(--font-size-display);
+  }
+
+  .hero__stats {
+    gap: var(--space-12);
+  }
+
+  .card-fan {
+    --fan-scale: 0.75;
+  }
+
+  .home-fighters {
+    padding-block: var(--space-30) var(--space-24);
+  }
+
+  .home-steps,
+  .home-factions {
+    padding-block: var(--space-20);
+  }
+
+  .step-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .step-grid--featured > :first-child {
+    grid-column: 1 / -1;
+  }
+
+  .trophy-panel {
+    padding: var(--space-14);
+  }
+
+  .cta-panel__title {
+    font-size: var(--font-size-6xl);
+  }
+}
+
+/* ---------- Desktop ---------- */
+@media (min-width: 64rem) {
+  /* Griglia "bento" come in Figma: 660px + colonna, poi due card uguali */
+  .step-grid--featured {
+    grid-template-columns: 14fr 11fr;
+    grid-template-rows: 17.5rem 17.5rem;
+  }
+
+  .step-grid--featured > :first-child {
+    grid-column: auto;
+    grid-row: span 2;
+  }
+
+  .step-grid--pair {
+    grid-auto-rows: 18.75rem;
+  }
+
+  .home-factions__header {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  .faction-list {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(5, 1fr);
+    overflow: visible;
+    padding-bottom: 0;
+  }
+
+  .trophy-panel {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .trophy-list {
+    flex-wrap: nowrap;
+  }
+}
+
+@media (min-width: 75rem) {
+  .card-fan {
+    --fan-scale: 1;
+  }
+}

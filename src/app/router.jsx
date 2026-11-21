@@ -11,6 +11,7 @@ import AppLayout from './layout/AppLayout.jsx';
 import Negozio from './routes/Negozio.jsx';
 import NotFound from './routes/NotFound.jsx';
 import Partita from './routes/Partita.jsx';
+import Trofei from './routes/Trofei.jsx';
 
 export const router = createBrowserRouter(
   [
@@ -23,6 +24,7 @@ export const router = createBrowserRouter(
         // TODO: aggiungere qui le rotte dell'area giocatore man mano che vengono implementate
         // (login, registrazione, dashboard, collezione, mazzi, scambi, sfide, trofei, …)
         { path: 'negozio', element: <Negozio /> },
+        { path: 'trofei', element: <Trofei /> },
         { path: '*', element: <NotFound /> },
       ],
     },

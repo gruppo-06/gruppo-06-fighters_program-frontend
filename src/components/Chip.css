@@ -1,0 +1,52 @@
+.chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  background: transparent;
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--transition),
+    border-color var(--transition),
+    color var(--transition);
+}
+
+.chip:hover {
+  border-color: var(--color-text-secondary);
+  color: var(--color-text-primary);
+}
+
+.chip--selected,
+.chip--selected:hover {
+  background: var(--color-text-primary);
+  border-color: var(--color-text-primary);
+  color: var(--color-background-page);
+}
+
+/* Tendina: il <select> nativo, invisibile, copre tutto il chip e riceve click e tastiera */
+.chip--select select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.chip--select:focus-within {
+  outline: 2px solid var(--color-accent-highlight);
+  outline-offset: 2px;
+}
+
+/* Le opzioni del menu aperto usano i colori del sistema: le rendiamo scure */
+.chip--select option {
+  background: var(--color-background-surface);
+  color: var(--color-text-primary);
+}

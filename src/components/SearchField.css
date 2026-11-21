@@ -1,0 +1,48 @@
+/* Campo di ricerca (Figma: SearchField). */
+.search-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  background: var(--color-background-surface-sunken);
+  border: 1px solid var(--color-border-default);
+  cursor: text;
+  transition: border-color var(--transition);
+}
+
+.search-field:hover {
+  border-color: var(--color-border-strong);
+}
+
+.search-field:has(input:focus-visible) {
+  border-color: var(--color-text-secondary);
+}
+
+.search-field__icon {
+  color: var(--color-text-muted);
+}
+
+.search-field__input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-body);
+}
+
+.search-field__input::placeholder {
+  color: var(--color-text-muted);
+  opacity: 1;
+}
+
+.search-field__input:focus-visible {
+  outline: none;
+}
+
+/* Nasconde la "x" di cancellazione aggiunta da Chrome/Safari */
+.search-field__input::-webkit-search-cancel-button {
+  appearance: none;
+}

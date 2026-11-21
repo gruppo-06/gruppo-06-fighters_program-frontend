@@ -122,11 +122,11 @@ export default function Trofei() {
             ))}
           </div>
           <ChipSelect
-            prefix="Mostra:"
-            label="Mostra trofei"
+            label="Mostra"
             value={status}
             options={STATUS_OPTIONS}
             onChange={setStatus}
+            emptyValue="all"
           />
         </div>
 

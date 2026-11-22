@@ -1,15 +1,17 @@
 import Icon from './Icon.jsx';
 import './Price.css';
 
-const formatter = new Intl.NumberFormat('it-IT');
+// 'always': in italiano i numeri di 4 cifre resterebbero senza punto (1030 invece di 1.030)
+const formatter = new Intl.NumberFormat('it-IT', { useGrouping: 'always' });
 
-const ICON_SIZES = { md: 20, lg: 28 };
+const ICON_SIZES = { sm: 14, md: 20, lg: 28, xl: 30 };
 
 /**
  * Prezzo / importo in crediti (Figma: Prezzo): icona crediti + numero in Teko.
  *
  * @param {number|null} amount  importo; se null mostra un trattino
- * @param {'md'|'lg'} [size='md']  md = 38px (card, saldo), lg = 60px (banner)
+ * @param {'sm'|'md'|'lg'|'xl'} [size='md']  sm = 16px (testo), md = 38px (card, saldo),
+ *   lg = 60px (banner), xl = 72px (modale)
  */
 export default function Price({ amount, size = 'md', className = '' }) {
   return (

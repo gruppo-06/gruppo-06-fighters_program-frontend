@@ -1,0 +1,83 @@
+/* Pagina Mazzi: elenco dei mazzi e editor (vedi DeckEditor). Mobile-first. */
+
+.mazzi {
+  /* Come le altre pagine dell'area giocatore: il contenuto è più largo del container standard */
+  --container-max: calc(75rem + 2 * var(--space-4));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding-block: var(--space-8) var(--space-16);
+}
+
+.mazzi p {
+  margin: 0;
+}
+
+.mazzi-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.mazzi-title {
+  font-family: var(--font-display);
+  font-size: var(--font-size-5xl);
+  line-height: var(--line-height-display);
+  text-transform: uppercase;
+}
+
+.mazzi-status {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.mazzi-alert {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-accent-primary);
+  background: var(--color-accent-primary-dark);
+  color: var(--color-text-primary);
+}
+
+/* ---------- Elenco dei mazzi ---------- */
+.mazzi-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mazzi-deck {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border-default);
+  background: var(--color-background-surface-sunken);
+}
+
+.mazzi-deck__name {
+  font-weight: var(--font-weight-semibold);
+}
+
+.mazzi-deck__meta {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.mazzi-deck__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+@media (min-width: 48rem) {
+  .mazzi-title {
+    font-size: var(--font-size-5xl);
+  }
+}

@@ -10,6 +10,10 @@
   margin: 0;
 }
 
+.deck-status {
+  color: var(--color-text-muted);
+}
+
 /* ---------- Barra superiore: titolo, contatori, azioni ---------- */
 .deck-bar {
   background: var(--color-background-surface-sunken);
@@ -182,39 +186,6 @@
 .deck-filters__label {
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
-}
-
-/* Selettore a segmenti "Tutte / Fighter / Effetto" */
-.segmented {
-  display: inline-flex;
-  padding: 3px;
-  background: var(--color-background-surface-sunken);
-  border: 1px solid var(--color-border-default);
-}
-
-.segmented__option {
-  padding: 6px var(--space-5);
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--color-text-secondary);
-  font-family: var(--font-body);
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-tight);
-  cursor: pointer;
-  transition:
-    background-color var(--transition),
-    color var(--transition);
-}
-
-.segmented__option:hover {
-  color: var(--color-text-primary);
-}
-
-.segmented__option[aria-pressed='true'] {
-  background: var(--color-background-placeholder);
-  border-color: var(--color-border-strong);
-  color: var(--color-text-primary);
 }
 
 /* ---------- Griglia delle carte ---------- */
@@ -409,6 +380,39 @@
   color: var(--color-accent-highlight);
 }
 
+/* Risultato di POST /me/decks/validate: il server è la fonte di verità */
+.deck-panel__validation-status {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.deck-panel__valid {
+  color: var(--color-rarity-rara);
+  font-size: var(--font-size-sm);
+}
+
+.deck-panel__violations {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: 0;
+  color: var(--color-accent-highlight);
+  font-size: var(--font-size-sm);
+  list-style: none;
+}
+
+.deck-panel__alert {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-accent-highlight);
+  background: var(--color-accent-primary-dark);
+  font-size: var(--font-size-sm);
+}
+
+.deck-panel__alert ul {
+  margin: var(--space-2) 0 0;
+  padding-left: var(--space-4);
+}
+
 .deck-panel__section {
   display: flex;
   flex-direction: column;
@@ -475,13 +479,6 @@
 
 .deck-list__item--leggendaria {
   --rarity-color: var(--color-rarity-leggendaria);
-}
-
-/* Carte Effetto: barra tratteggiata, come il bordo della carta */
-.deck-list__item--effetto {
-  box-shadow: none;
-  background: linear-gradient(var(--color-text-secondary) 50%, transparent 50%) left / 2px 6px
-    repeat-y;
 }
 
 .deck-list__text {
@@ -602,10 +599,6 @@
 
   .deck-filters__selects {
     flex-wrap: nowrap;
-  }
-
-  .segmented__option {
-    padding-inline: var(--space-4);
   }
 
   .deck-grid {

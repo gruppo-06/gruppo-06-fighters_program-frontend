@@ -12,6 +12,7 @@ const STARTING_HEALTH = 500;
 
 const MODE_LABELS = {
   BASE: 'Partita base',
+  ADVANCED: 'Partita avanzata',
 };
 
 const OTHER_SIDE = { ONE: 'TWO', TWO: 'ONE' };
@@ -31,22 +32,39 @@ function findSnapshot(deck, fighter) {
 }
 
 /** Snapshot del mazzo → fighter per FighterCard. */
+/** Le partite giocate prima della modalità avanzata non hanno VEL e CRT nello snapshot. */
+const MISSING_STAT = '–';
+
 function toReplayFighter(snapshot) {
   const fighter = toFighter(snapshot);
   return {
     ...fighter,
     image: cardImageUrl(snapshot.code),
-    stats: { ...fighter.stats, vel: fighter.stats.vel ?? '–', crt: fighter.stats.crt ?? '–' },
+    stats: {
+      ...fighter.stats,
+      vel: fighter.stats.vel ?? MISSING_STAT,
+      crt: fighter.stats.crt ?? MISSING_STAT,
+    },
   };
 }
 
-/** Fighter di un round, con i danni subiti e l'eventuale KO. */
+/**
+ * Fighter di un round, con i danni subiti, l'eventuale KO e, nelle partite
+ * avanzate, primo colpo, schivata e colpo critico di questo fighter.
+ */
 function toCombatant(deck, fighter, damage, ko) {
   const snapshot = findSnapshot(deck, fighter);
   if (!snapshot) {
     throw new Error(`Carta ${fighter.cardCode} non trovata nel mazzo del replay.`);
   }
-  return { fighter: toReplayFighter(snapshot), damage, ko };
+  return {
+    fighter: toReplayFighter(snapshot),
+    damage,
+    ko,
+    first: Boolean(fighter.struckFirst),
+    dodged: Boolean(fighter.dodged),
+    critical: Boolean(fighter.criticalHit),
+  };
 }
 
 /** Carte ancora nel mazzo dopo quella schierata. */
@@ -67,6 +85,7 @@ export function toBattle(replay, myNickname) {
   }
 
   const summary = log.summary;
+  const mode = replay.mode ?? log.mode;
   // Se il nickname non corrisponde a nessuno dei due, mostra il challenger come "me".
   const me =
     replay.challengerNickname === myNickname
@@ -134,7 +153,8 @@ export function toBattle(replay, myNickname) {
 
   return {
     id: replay.id,
-    mode: MODE_LABELS[log.mode] ?? log.mode,
+    mode: MODE_LABELS[mode] ?? mode,
+    advanced: mode === 'ADVANCED',
     maxTurns: summary.totalTurns,
     startingHp: STARTING_HEALTH,
     players: {

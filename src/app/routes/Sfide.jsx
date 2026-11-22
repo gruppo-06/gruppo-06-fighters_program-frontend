@@ -20,6 +20,18 @@ const RESULTS = {
   DRAW: { label: 'Pareggio', className: 'sfide-result--draw' },
 };
 
+const MODE_OPTIONS = [
+  { value: 'BASE', label: 'Base', hint: 'Solo attacco e difesa' },
+  { value: 'ADVANCED', label: 'Avanzata', hint: 'Velocità, schivata e colpi critici' },
+];
+
+const MODE_TAGS = {
+  BASE: { label: 'Base', tone: 'outline' },
+  ADVANCED: { label: 'Avanzata', tone: 'epica' },
+};
+
+const ADVANCED_DISABLED_MESSAGE = 'The advanced mode is not enabled';
+
 const dateFormatter = new Intl.DateTimeFormat('it-IT', { dateStyle: 'short', timeStyle: 'short' });
 
 const formatDate = (value) => dateFormatter.format(new Date(value));
@@ -30,6 +42,9 @@ const defaultDeckValue = (decks) => (decks[0] ? String(decks[0].id) : '');
 function challengeErrorMessage(error) {
   if (!(error instanceof ApiError)) return ACTION_ERROR;
   if (error.status === 404) return 'Giocatore non trovato';
+  if (error.status === 400 && error.message === ADVANCED_DISABLED_MESSAGE) {
+    return 'La modalità avanzata non è attiva sul server';
+  }
   if (error.status === 400) return 'Non puoi sfidare te stesso';
   if (error.status === 422) return error.message;
   return ACTION_ERROR;
@@ -180,11 +195,22 @@ export default function Sfide() {
   );
 }
 
+function ModeTag({ mode }) {
+  const { label, tone } = MODE_TAGS[mode] ?? MODE_TAGS.BASE;
+  return (
+    <Tag tone={tone} className="sfide-row__mode">
+      {label}
+    </Tag>
+  );
+}
+
 function ChallengeForm({ decks, onSent }) {
   const nicknameId = useId();
   const deckSelectId = useId();
+  const modeName = useId();
   const [nickname, setNickname] = useState('');
   const [chosenDeck, setChosenDeck] = useState('');
+  const [mode, setMode] = useState('BASE');
   const [busy, setBusy] = useState(false);
   const [feedback, setFeedback] = useState(null);
 
@@ -212,6 +238,7 @@ function ChallengeForm({ decks, onSent }) {
       const match = await api.post('/matches', {
         opponentNickname: nickname.trim(),
         deckId: deck.id,
+        mode,
       });
       setNickname('');
       setFeedback({ tone: 'success', text: `Sfida inviata a @${match.opponentNickname}.` });
@@ -250,6 +277,25 @@ function ChallengeForm({ decks, onSent }) {
           ))}
         </select>
       </label>
+      <fieldset className="sfide-mode">
+        <legend>Modalità</legend>
+        <div className="sfide-mode__options">
+          {MODE_OPTIONS.map((option) => (
+            <label key={option.value} className="sfide-mode__option">
+              <input
+                type="radio"
+                name={modeName}
+                value={option.value}
+                checked={mode === option.value}
+                onChange={() => setMode(option.value)}
+                disabled={busy}
+              />
+              <span className="sfide-mode__name">{option.label}</span>
+              <span className="sfide-mode__hint">{option.hint}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
       <button className="button" type="submit" disabled={busy}>
         {busy ? 'Invio in corso…' : 'Lancia la sfida'}
       </button>
@@ -274,7 +320,9 @@ function IncomingRow({ match, decks, busy, onAccept, onDecline }) {
   return (
     <li className="sfide-row">
       <div className="sfide-row__info">
-        <p className="sfide-row__title">@{match.challengerNickname} ti sfida</p>
+        <p className="sfide-row__title">
+          @{match.challengerNickname} ti sfida <ModeTag mode={match.mode} />
+        </p>
         <p className="sfide-row__meta">
           {formatDate(match.createdAt)} · {STATUS_LABELS[match.status] ?? match.status}
         </p>
@@ -320,7 +368,9 @@ function OutgoingRow({ match, busy, onCancel }) {
   return (
     <li className="sfide-row">
       <div className="sfide-row__info">
-        <p className="sfide-row__title">Hai sfidato @{match.opponentNickname}</p>
+        <p className="sfide-row__title">
+          Hai sfidato @{match.opponentNickname} <ModeTag mode={match.mode} />
+        </p>
         <p className="sfide-row__meta">
           {formatDate(match.createdAt)} · {STATUS_LABELS[match.status] ?? match.status}
         </p>

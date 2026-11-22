@@ -361,6 +361,40 @@
     match-ko 0.4s 0.9s ease forwards;
 }
 
+.combatant__frame {
+  position: relative;
+  width: min(100%, 15.5rem);
+}
+
+/* Modalità avanzata: etichette sopra la carta (primo colpo, schivata, critico) */
+.combatant__flags {
+  position: absolute;
+  top: var(--space-3);
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  translate: -50% 0;
+  pointer-events: none;
+}
+
+.combatant__flag {
+  animation: match-pop 0.4s 0.5s ease both;
+}
+
+.battle .combatant__flag--first {
+  background: var(--color-background-surface-sunken);
+}
+
+.battle .combatant__flag--dodge {
+  --tag-color: var(--color-rarity-rara);
+}
+
+.battle .combatant__flag--critical {
+  --tag-color: var(--color-accent-highlight);
+}
+
 /* ---------- Cronaca round per round ---------- */
 .battle-log {
   display: flex;
@@ -612,6 +646,24 @@ body:has(.result-backdrop) {
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.result__advanced-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.result__advanced-player {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border-default);
+  background: var(--color-background-surface-sunken);
 }
 
 .result__card {

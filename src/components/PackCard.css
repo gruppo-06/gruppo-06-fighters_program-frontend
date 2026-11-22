@@ -55,10 +55,46 @@
   line-height: 1.45;
 }
 
+/* Composizione per rarità */
+.pack-card__composition {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: var(--space-3);
+}
+
+.pack-card__composition-label {
+  color: var(--color-text-muted);
+  font-size: 0.6875rem; /* 11px Label/Stat */
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pack-contents {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 .pack-card__footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
+  margin-top: auto;
   padding-top: 10px;
+}
+
+.pack-card .button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pack-card .button:disabled:hover {
+  background: var(--color-accent-primary);
 }

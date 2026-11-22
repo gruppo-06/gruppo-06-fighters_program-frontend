@@ -40,6 +40,7 @@
 
 .shop-balance {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-5);
   padding: var(--space-3) var(--space-4);
@@ -47,13 +48,60 @@
   border: 1px solid var(--color-border-default);
 }
 
-.shop-balance__label {
+.shop-balance__label,
+.shop-daily__label {
   color: var(--color-text-muted);
   font-size: 0.6875rem; /* 11px Label/Stat */
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-tight);
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+/* ---------- Bonus giornaliero ---------- */
+.shop-daily {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  padding-left: var(--space-5);
+  border-left: 1px solid var(--color-border-default);
+}
+
+.shop-daily__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.shop-daily__amount {
+  font-family: var(--font-display);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+}
+
+.shop-daily__status {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+}
+
+.shop-daily__hint {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.45;
+}
+
+.shop-error {
+  padding: var(--space-3) var(--space-4);
+  background: color-mix(in srgb, var(--color-accent-primary) 15%, transparent);
+  border: 1px solid var(--color-accent-primary);
+  color: var(--color-accent-highlight);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.45;
 }
 
 /* ---------- Pacchetto in evidenza ---------- */
@@ -122,6 +170,19 @@
   color: var(--color-text-secondary);
   font-size: var(--font-size-md);
   line-height: var(--line-height-body);
+}
+
+.shop-featured__contents {
+  margin-bottom: 6px;
+}
+
+.shop-featured .button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.shop-featured .button:disabled:hover {
+  background: var(--color-accent-primary);
 }
 
 .shop-featured__actions {

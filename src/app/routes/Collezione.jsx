@@ -4,11 +4,13 @@ import CardDetail from '../../components/CardDetail.jsx';
 import Chip, { ChipSelect } from '../../components/Chip.jsx';
 import FighterCard from '../../components/FighterCard.jsx';
 import MeterStat from '../../components/MeterStat.jsx';
+import Placeholder from '../../components/Placeholder.jsx';
 import { RARITY_LABELS } from '../../components/rarity.js';
 import SearchField from '../../components/SearchField.jsx';
 import Tag from '../../components/Tag.jsx';
 import { api } from '../../services/api.js';
 import { CLASSES, FACTIONS, RARITIES, toFighter } from '../../services/cards.js';
+import { PREVIEW_EFFECTS } from '../../data/previewEffects.js';
 import './Collezione.css';
 
 const ALL = '';
@@ -210,6 +212,28 @@ export default function Collezione() {
           </ul>
         )}
       </section>
+
+      {/* Anteprima Carte Effetto */}
+      <Placeholder
+        eyebrow="Anteprima — dati di esempio"
+        title="Carte Effetto"
+        description="Questa sezione mostra un'anteprima delle future Carte Effetto. Non sono ancora ottenibili nel gioco."
+      >
+        <ul
+          className="collection-grid preview-effects-grid"
+          role="list"
+          aria-label="Carte Effetto di anteprima"
+        >
+          {PREVIEW_EFFECTS.map((card) => (
+            <li key={card.number} className="collection-cell">
+              <div className="collection-cell__card">
+                <FighterCard fighter={card} owned={false} />
+              </div>
+              <p className="collection-cell__missing">Anteprima</p>
+            </li>
+          ))}
+        </ul>
+      </Placeholder>
 
       <CardDetail
         card={selectedCard}

@@ -21,7 +21,9 @@ export default function Matchmaking({ match, onStart }) {
 
   return (
     <div className="match matchmaking">
-      <p className="eyebrow">{match.mode} · Avversario trovato</p>
+      <p className="eyebrow">
+        {match.advanced ? 'Modalità avanzata' : 'Modalità base'} · Avversario trovato
+      </p>
 
       <div className="matchmaking__versus">
         <PlayerIntro player={me} />

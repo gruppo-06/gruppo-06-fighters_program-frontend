@@ -3,6 +3,9 @@
  * Da sostituire con i dati reali tramite src/services/api.js (es. GET /packs).
  * Le immagini andranno in public/images/packs/ con percorso assoluto,
  * es. '/images/packs/leggendario.webp'; con `image: null` si vede il segnaposto.
+ *
+ * `details` alimenta la modale di dettaglio. Solo l'Avanzato ha un mockup completo:
+ * per gli altri ci sono solo i dati già presenti nel negozio (niente probabilità).
  */
 const HOUR = 60 * 60 * 1000;
 
@@ -13,6 +16,18 @@ export const mockPacks = [
     description: '5 carte · 3 comuni, 1 rara, 1 carta Effetto',
     price: 100,
     image: null,
+    tier: { label: 'Base', tone: 'comune' },
+    details: {
+      summary: [
+        { value: '5', label: 'carte per pacchetto' },
+        { value: '1', label: 'rara' },
+      ],
+      contents: [
+        { label: 'Comuni', value: '× 3' },
+        { label: 'Rara', value: '× 1' },
+        { label: 'Carta Effetto', value: '× 1' },
+      ],
+    },
   },
   {
     id: 'avanzato',
@@ -20,6 +35,37 @@ export const mockPacks = [
     description: '8 carte · 4 comuni, 2 rare, 1 epica, 1 Effetto',
     price: 220,
     image: null,
+    tier: { label: 'Avanzato', tone: 'epica' },
+    details: {
+      season: 'Stagione 1',
+      availability: 'Sempre disponibile',
+      description:
+        'Il pacchetto bilanciato per far crescere la collezione: più carte rare, una epica garantita e una carta Effetto per completare il tuo mazzo.',
+      summary: [
+        { value: '8', label: 'carte per pacchetto' },
+        { value: '1', label: 'epica garantita' },
+        { value: '5%', label: 'leggendaria nello slot bonus' },
+      ],
+      contents: [
+        { label: 'Comuni', value: '× 4' },
+        { label: 'Rare', value: '× 2' },
+        { label: 'Epica garantita', value: '× 1' },
+        { label: 'Carta Effetto', value: '× 1' },
+      ],
+      // TODO: chiarire con il gruppo se lo slot bonus è una nona carta
+      odds: [
+        { label: 'Comune', value: '55%' },
+        { label: 'Rara', value: '28%' },
+        { label: 'Epica', value: '12%' },
+        { label: 'Leggendaria', value: '5%' },
+      ],
+      notes: [
+        'Le copie doppie restano in collezione: puoi usarle nei mazzi (max 3) o scambiarle.',
+        // TODO: il conteggio "ne mancano 6" deve arrivare dal backend
+        'Leggendaria garantita ogni 10 pacchetti senza leggendaria: ne mancano 6.',
+        "L'acquisto è definitivo: i crediti spesi non sono rimborsabili dopo l'apertura.",
+      ],
+    },
   },
   {
     id: 'leggendario',
@@ -30,6 +76,16 @@ export const mockPacks = [
     price: 500,
     image: null,
     featured: true,
+    tier: { label: 'Leggendario', tone: 'leggendaria' },
+    details: {
+      season: 'Stagione 1',
+      description: '10 carte · 1 leggendaria garantita · fighter esclusivi della Stagione 1',
+      summary: [
+        { value: '10', label: 'carte per pacchetto' },
+        { value: '1', label: 'leggendaria garantita' },
+      ],
+      contents: [{ label: 'Leggendaria garantita', value: '× 1' }],
+    },
     // Offerta a tempo: termina tra 2 giorni e 14 ore
     endsAt: Date.now() + (2 * 24 + 14) * HOUR,
   },

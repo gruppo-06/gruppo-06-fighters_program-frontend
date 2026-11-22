@@ -1,11 +1,14 @@
 /** Negozio dei pacchetti (Figma: NEGOZIO). */
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import PackCard from '../../components/PackCard.jsx';
 import Price from '../../components/Price.jsx';
 import Tag from '../../components/Tag.jsx';
 import { mockPacks } from '../../data/mockPacks.js';
-import { api } from '../../services/api.js';
+import { purchasePack } from '../../data/mockShop.js';
+import { useCredits } from '../useCredits.js';
+import DettaglioPacchetto from './negozio/DettaglioPacchetto.jsx';
 import './Negozio.css';
 
 const HOUR = 60 * 60 * 1000;
@@ -22,23 +25,14 @@ export default function Negozio() {
   const packs = mockPacks;
   const featured = packs.find((pack) => pack.featured);
 
-  // null finché non arriva la risposta di GET /me (o se non autenticato)
-  const [credits, setCredits] = useState(null);
+  const navigate = useNavigate();
+  const credits = useCredits();
   const [now] = useState(Date.now);
+  const [selected, setSelected] = useState(null);
 
-  useEffect(() => {
-    let cancelled = false;
-    api
-      .get('/me')
-      .then((user) => !cancelled && setCredits(user?.credits ?? null))
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  // TODO: aprire la modale "Dettaglio pacchetto" (Figma 258:6200)
-  function handleBuy() {}
+  function handlePurchase(pack) {
+    navigate('/negozio/apertura', { state: { opening: purchasePack(pack) } });
+  }
 
   // TODO: riscattare il bonus giornaliero (endpoint da concordare con il backend)
   function handleDailyBonus() {}
@@ -81,7 +75,11 @@ export default function Negozio() {
           </p>
           <div className="shop-featured__actions">
             <Price amount={featured.price} size="lg" />
-            <button type="button" className="button button--lg" onClick={() => handleBuy(featured)}>
+            <button
+              type="button"
+              className="button button--lg"
+              onClick={() => setSelected(featured)}
+            >
               Apri ora
               <Icon name="arrow-right" size={16} />
             </button>
@@ -99,11 +97,25 @@ export default function Negozio() {
         <ul className="shop-catalog__grid" role="list">
           {packs.map((pack) => (
             <li key={pack.id}>
-              <PackCard {...pack} onBuy={() => handleBuy(pack)} />
+              <PackCard {...pack} onBuy={() => setSelected(pack)} />
             </li>
           ))}
         </ul>
       </section>
+
+      {selected && (
+        <DettaglioPacchetto
+          pack={selected}
+          credits={credits}
+          availability={
+            selected.endsAt
+              ? `Termina tra ${formatTimeLeft(selected.endsAt, now)}`
+              : selected.details.availability
+          }
+          onClose={() => setSelected(null)}
+          onPurchase={handlePurchase}
+        />
+      )}
     </div>
   );
 }

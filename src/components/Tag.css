@@ -29,3 +29,9 @@
 .tag--leggendaria {
   --tag-color: var(--color-rarity-leggendaria);
 }
+
+.tag--elemento {
+  border-color: var(--color-border-strong);
+  background: var(--color-background-surface-sunken);
+  color: var(--color-text-primary);
+}

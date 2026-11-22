@@ -200,6 +200,15 @@ function Combatant({ side, hit, advanced }) {
         <FighterCard fighter={hit.fighter} className="combatant__card" />
         {advanced && <CombatFlags hit={hit} />}
       </div>
+      {advanced && hit.fighter.subcardNames?.length > 0 && (
+        <ul className="combatant__subcards" role="list" aria-label="Sottocarte">
+          {hit.fighter.subcardNames.map((name, i) => (
+            <li key={`${name}-${i}`}>
+              <Tag tone="outline">{name}</Tag>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

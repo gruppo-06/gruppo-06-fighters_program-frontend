@@ -461,6 +461,7 @@
 .deck-list__item {
   --rarity-color: var(--color-rarity-comune);
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
@@ -494,6 +495,89 @@
 .deck-list__meta {
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
+}
+
+/* Statistiche modificate dalle sottocarte: "ATK 245 → 274" */
+.deck-list__stats {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Sottocarte sotto la carta, a tutta larghezza */
+.deck-list__subcards,
+.deck-list__subcards-note {
+  flex-basis: 100%;
+  padding-right: var(--space-4);
+}
+
+.deck-list__subcards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.deck-list__subcards-note {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.deck-panel__note {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.subcard-slots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Slot di sottocarta: occupato (nome + ×) o libero (+ Sottocarta) */
+.subcard-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  max-width: 100%;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-background-surface-sunken);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+}
+
+.subcard-chip--empty {
+  border-style: dashed;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition:
+    color var(--transition),
+    border-color var(--transition);
+}
+
+.subcard-chip--empty:hover,
+.subcard-chip--empty[aria-expanded='true'] {
+  border-color: var(--color-accent-highlight);
+  color: var(--color-text-primary);
+}
+
+.subcard-chip__remove {
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: color var(--transition);
+}
+
+.subcard-chip__remove:hover {
+  color: var(--color-accent-highlight);
 }
 
 .deck-panel__footer {

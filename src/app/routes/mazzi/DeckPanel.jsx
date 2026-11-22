@@ -1,14 +1,28 @@
+import { useState } from 'react';
 import Icon from '../../../components/Icon.jsx';
 import Tag from '../../../components/Tag.jsx';
-import { COMPOSITION, DECK_SIZE, isLegendary } from './deckRules.js';
+import SubcardPicker from './SubcardPicker.jsx';
+import {
+  COMPOSITION,
+  DECK_SIZE,
+  changedStats,
+  isLegendary,
+  modifiedStats,
+  subcardSlots,
+} from './deckRules.js';
 
 /**
  * Pannello "Il tuo mazzo" (Figma: MAZZI – Passo 2): totale, problemi locali,
- * verifica del server, composizione per rarità, elenco carte con stepper e salvataggio.
+ * verifica del server, composizione per rarità, elenco carte con stepper,
+ * sottocarte e salvataggio.
  *
  * @param {{ card, count }[]} entries   righe del mazzo (vedi deckEntries)
  * @param {object} summary              risultato di summarizeDeck
  * @param {(card) => string|null} getBlockReason  motivo per cui non si può aggiungere
+ * @param {object[]} subcardCatalog     sottocarte di GET /subcards
+ * @param {(card) => string[]} subcardsOf  codici delle sottocarte applicate alla carta
+ * @param {(card, code) => void} onAddSubcard
+ * @param {(card, code) => void} onRemoveSubcard
  * @param {{ status: 'pending'|'valid'|'invalid'|'error', violations?: { code, message }[] }} validation
  * @param {boolean} canSave  il server considera valido il mazzo e il nome non è vuoto
  * @param {boolean} nameMissing  il nome del mazzo è vuoto
@@ -21,6 +35,10 @@ export default function DeckPanel({
   getBlockReason,
   onAdd,
   onRemove,
+  subcardCatalog,
+  subcardsOf,
+  onAddSubcard,
+  onRemoveSubcard,
   onSave,
   validation,
   canSave,
@@ -111,6 +129,9 @@ export default function DeckPanel({
             </div>
           ))}
         </dl>
+        <p className="deck-panel__note">
+          Le sottocarte modificano le statistiche solo nella modalità avanzata.
+        </p>
       </section>
 
       {entries.length === 0 ? (
@@ -123,6 +144,10 @@ export default function DeckPanel({
           getBlockReason={getBlockReason}
           onAdd={onAdd}
           onRemove={onRemove}
+          subcardCatalog={subcardCatalog}
+          subcardsOf={subcardsOf}
+          onAddSubcard={onAddSubcard}
+          onRemoveSubcard={onRemoveSubcard}
         />
       )}
 
@@ -160,7 +185,18 @@ export default function DeckPanel({
   );
 }
 
-function DeckList({ id, title, entries, getBlockReason, onAdd, onRemove }) {
+function DeckList({
+  id,
+  title,
+  entries,
+  getBlockReason,
+  onAdd,
+  onRemove,
+  subcardCatalog,
+  subcardsOf,
+  onAddSubcard,
+  onRemoveSubcard,
+}) {
   if (entries.length === 0) return null;
 
   return (
@@ -174,12 +210,22 @@ function DeckList({ id, title, entries, getBlockReason, onAdd, onRemove }) {
           const meta = [card.region, card.role, isLegendary(card) && 'abilità unica']
             .filter(Boolean)
             .join(' · ');
+          const codes = subcardsOf(card);
+          const applied = codes
+            .map((code) => subcardCatalog.find((subcard) => subcard.code === code))
+            .filter(Boolean);
+          const changes = changedStats(card.stats, modifiedStats(card.stats, applied));
 
           return (
             <li key={card.cardId} className={`deck-list__item deck-list__item--${card.rarity}`}>
               <div className="deck-list__text">
                 <p className="deck-list__name">{card.name}</p>
                 <p className="deck-list__meta">{meta}</p>
+                {changes.length > 0 && (
+                  <p className="deck-list__stats">
+                    {changes.map(({ label, from, to }) => `${label} ${from} → ${to}`).join(' · ')}
+                  </p>
+                )}
               </div>
               <div className="deck-stepper">
                 <button
@@ -207,10 +253,87 @@ function DeckList({ id, title, entries, getBlockReason, onAdd, onRemove }) {
                   <Icon name="plus" size={16} />
                 </button>
               </div>
+
+              <SubcardSlots
+                card={card}
+                codes={codes}
+                catalog={subcardCatalog}
+                onAdd={(code) => onAddSubcard(card, code)}
+                onRemove={(code) => onRemoveSubcard(card, code)}
+              />
             </li>
           );
         })}
       </ul>
     </section>
+  );
+}
+
+/**
+ * Slot delle sottocarte di una carta del mazzo: quelli occupati mostrano il nome
+ * con il pulsante per toglierla, quelli liberi aprono la scelta. Le leggendarie non hanno slot.
+ */
+function SubcardSlots({ card, codes, catalog, onAdd, onRemove }) {
+  const [picking, setPicking] = useState(false);
+  const slots = subcardSlots(card);
+
+  if (slots === 0) {
+    return (
+      <p className="deck-list__subcards-note">
+        Nessuna sottocarta: le leggendarie hanno un'abilità speciale (in arrivo)
+      </p>
+    );
+  }
+
+  const free = Math.max(0, slots - codes.length);
+
+  return (
+    <div className="deck-list__subcards">
+      <ul className="subcard-slots" role="list" aria-label={`Sottocarte di ${card.name}`}>
+        {codes.map((code) => {
+          const name = catalog.find((subcard) => subcard.code === code)?.name ?? code;
+          return (
+            <li key={code} className="subcard-chip">
+              <span>{name}</span>
+              <button
+                type="button"
+                className="subcard-chip__remove"
+                onClick={() => onRemove(code)}
+                aria-label={`Togli ${name} da ${card.name}`}
+              >
+                <Icon name="close" size={12} />
+              </button>
+            </li>
+          );
+        })}
+        {Array.from({ length: free }, (_, i) => (
+          <li key={`free-${i}`}>
+            <button
+              type="button"
+              className="subcard-chip subcard-chip--empty"
+              onClick={() => setPicking((open) => !open)}
+              aria-expanded={picking}
+              aria-label={`Aggiungi una sottocarta a ${card.name}`}
+            >
+              <Icon name="plus" size={12} />
+              Sottocarta
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      {picking && free > 0 && (
+        <SubcardPicker
+          cardName={card.name}
+          catalog={catalog}
+          taken={codes}
+          onPick={(code) => {
+            onAdd(code);
+            setPicking(false);
+          }}
+          onClose={() => setPicking(false)}
+        />
+      )}
+    </div>
   );
 }

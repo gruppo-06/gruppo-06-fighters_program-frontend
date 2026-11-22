@@ -16,6 +16,7 @@ import {
   MAX_POWER,
   NEW_DECK_ID,
   addBlockReason,
+  canAddSubcard,
   deckEntries,
   summarizeDeck,
 } from './deckRules.js';
@@ -100,14 +101,16 @@ export default function MazzoEditor() {
     Promise.all([
       api.get('/me/collection?size=100'),
       isNew ? Promise.resolve(null) : api.get(`/me/decks/${deckId}`),
+      api.get('/subcards'),
     ]).then(
-      ([collectionPage, deck]) => {
+      ([collectionPage, deck, subcardCatalog]) => {
         if (cancelled) return;
         setResult({
           key: requestKey,
           status: 'ready',
           collection: collectionPage?.content ?? [],
           deck,
+          subcardCatalog: subcardCatalog ?? [],
         });
       },
       (error) => {
@@ -166,16 +169,25 @@ export default function MazzoEditor() {
       deckId={isNew ? null : deckId}
       deck={current.deck}
       collection={current.collection}
+      subcardCatalog={current.subcardCatalog}
     />
   );
 }
 
-function DeckEditor({ deckId, deck, collection }) {
+function DeckEditor({ deckId, deck, collection, subcardCatalog }) {
   const navigate = useNavigate();
 
   const [name, setName] = useState(deck?.name ?? 'Nuovo mazzo');
   const [cards, setCards] = useState(() =>
     Object.fromEntries((deck?.cards ?? []).map((card) => [String(card.cardId), card.copies])),
+  );
+  // Codici delle sottocarte per carta: { [cardId]: ['SC01', …] }
+  const [subcards, setSubcards] = useState(() =>
+    Object.fromEntries(
+      (deck?.cards ?? [])
+        .filter((card) => card.subcards?.length > 0)
+        .map((card) => [String(card.cardId), card.subcards.map((subcard) => subcard.code).sort()]),
+    ),
   );
 
   const [query, setQuery] = useState('');
@@ -217,9 +229,13 @@ function DeckEditor({ deckId, deck, collection }) {
   const payloadCards = useMemo(
     () =>
       entries
-        .map(({ card, count }) => ({ cardId: card.cardId, copies: count }))
+        .map(({ card, count }) => ({
+          cardId: card.cardId,
+          copies: count,
+          subcards: subcards[String(card.cardId)] ?? [],
+        }))
         .sort((a, b) => String(a.cardId).localeCompare(String(b.cardId))),
-    [entries],
+    [entries, subcards],
   );
   const cardsKey = JSON.stringify(payloadCards);
 
@@ -267,12 +283,42 @@ function DeckEditor({ deckId, deck, collection }) {
       else delete next[key];
       return next;
     });
+    // Le sottocarte valgono per tutte le copie: senza copie la carta non le conserva
+    if ((cards[key] ?? 0) + delta <= 0) {
+      setSubcards((current) => {
+        const next = { ...current };
+        delete next[key];
+        return next;
+      });
+    }
   }
 
   const addCard = (card) => {
     if (getBlockReason(card) === null) changeCount(card, 1);
   };
   const removeCard = (card) => changeCount(card, -1);
+
+  const subcardsOf = (card) => subcards[String(card.cardId)] ?? [];
+
+  const addSubcard = (card, code) => {
+    const key = String(card.cardId);
+    if (!canAddSubcard(card, subcardsOf(card), code)) return;
+    setSubcards((current) => ({
+      ...current,
+      [key]: [...(current[key] ?? []), code].sort(),
+    }));
+  };
+
+  const removeSubcard = (card, code) => {
+    const key = String(card.cardId);
+    setSubcards((current) => {
+      const codes = (current[key] ?? []).filter((value) => value !== code);
+      const next = { ...current };
+      if (codes.length > 0) next[key] = codes;
+      else delete next[key];
+      return next;
+    });
+  };
 
   async function handleSave() {
     if (!canSave) return;
@@ -408,6 +454,10 @@ function DeckEditor({ deckId, deck, collection }) {
           getBlockReason={getBlockReason}
           onAdd={addCard}
           onRemove={removeCard}
+          subcardCatalog={subcardCatalog}
+          subcardsOf={subcardsOf}
+          onAddSubcard={addSubcard}
+          onRemoveSubcard={removeSubcard}
           onSave={handleSave}
           validation={validation}
           canSave={canSave}

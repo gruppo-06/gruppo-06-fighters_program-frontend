@@ -1,150 +1,70 @@
-/** I tuoi mazzi: elenco dei mazzi del giocatore e apertura dell'editor (Figma: MAZZI da definire). */
-import { useEffect, useState } from 'react';
+/**
+ * Elenco dei mazzi del giocatore (rotta /mazzi).
+ * TODO: non esiste ancora un mockup Figma di questa schermata: layout provvisorio,
+ * da allineare al design quando sarà disponibile. L'editor è in ./mazzi/MazzoEditor.jsx.
+ */
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import DeckEditor from '../../components/DeckEditor.jsx';
-import { api } from '../../services/api.js';
+import Icon from '../../components/Icon.jsx';
+import MeterStat from '../../components/MeterStat.jsx';
+import Tag from '../../components/Tag.jsx';
+import { mockCollection } from '../../data/mockCollection.js';
+import { mockDecks } from '../../data/mockDecks.js';
+import { DECK_SIZE, MAX_POWER, NEW_DECK_ID, summarizeDeck } from './mazzi/deckRules.js';
 import './Mazzi.css';
 
-const LOAD_ERROR = 'Impossibile caricare i mazzi. Riprova più tardi.';
-const DELETE_ERROR = 'Impossibile eliminare il mazzo. Riprova più tardi.';
-
-const dateFormatter = new Intl.DateTimeFormat('it-IT', { dateStyle: 'medium' });
-
-const formatDate = (value) => dateFormatter.format(new Date(value));
-
 export default function Mazzi() {
-  // null finché non arriva la risposta del backend
-  const [decks, setDecks] = useState(null);
-  const [loadError, setLoadError] = useState(false);
-  const [actionError, setActionError] = useState(null);
-  // incrementato per ricaricare l'elenco dopo un salvataggio o un'eliminazione
-  const [version, setVersion] = useState(0);
-  // null: elenco; { deckId: null } → mazzo nuovo; { deckId } → modifica
-  const [editing, setEditing] = useState(null);
+  // TODO: caricare mazzi e collezione dal backend (es. api.get('/decks')) quando l'endpoint esiste
+  const decks = mockDecks;
+  const collection = mockCollection;
 
-  useEffect(() => {
-    let cancelled = false;
-    api.get('/me/decks').then(
-      (data) => {
-        if (cancelled) return;
-        setDecks(data);
-        setLoadError(false);
-      },
-      () => {
-        if (cancelled) return;
-        setDecks((current) => current ?? []);
-        setLoadError(true);
-      },
-    );
-    return () => {
-      cancelled = true;
-    };
-  }, [version]);
-
-  async function deleteDeck(deck) {
-    if (!window.confirm(`Eliminare il mazzo "${deck.name}"? L'operazione non si può annullare.`)) {
-      return;
-    }
-    setActionError(null);
-    try {
-      await api.delete(`/me/decks/${deck.id}`);
-      setVersion((current) => current + 1);
-    } catch {
-      setActionError(DELETE_ERROR);
-    }
-  }
+  const cardsById = useMemo(() => new Map(collection.map((card) => [card.id, card])), [collection]);
 
   return (
-    <div className="container mazzi">
-      <header className="mazzi-header">
-        <h1 className="mazzi-title">I tuoi mazzi</h1>
-        {editing === null && (
-          <button type="button" className="button" onClick={() => setEditing({ deckId: null })}>
-            Nuovo mazzo
-          </button>
-        )}
+    <div className="container decks">
+      <header className="decks__header">
+        <div className="section-header">
+          <p className="eyebrow">Mazzi</p>
+          <h1 className="decks__title">I miei mazzi</h1>
+        </div>
+        <Link className="button" to={`/mazzi/${NEW_DECK_ID}`}>
+          <Icon name="plus" size={14} />
+          Nuovo mazzo
+        </Link>
       </header>
 
-      {editing ? (
-        <DeckEditor
-          key={editing.deckId ?? 'new'}
-          deckId={editing.deckId}
-          onSaved={() => {
-            setEditing(null);
-            setVersion((current) => current + 1);
-          }}
-          onCancel={() => setEditing(null)}
-        />
+      {decks.length === 0 ? (
+        <p className="decks__empty">Non hai ancora creato nessun mazzo.</p>
       ) : (
-        <DeckList
-          decks={decks}
-          loadError={loadError}
-          actionError={actionError}
-          onEdit={(deckId) => setEditing({ deckId })}
-          onDelete={deleteDeck}
-        />
+        <ul className="decks__grid" role="list">
+          {decks.map((deck) => {
+            const summary = summarizeDeck(deck.cards, cardsById);
+            return (
+              <li key={deck.id} className="deck-tile">
+                <div className="deck-tile__head">
+                  <h2 className="deck-tile__name">{deck.name}</h2>
+                  <Tag tone={summary.valid ? 'success' : 'alert'}>
+                    {summary.valid ? 'Valido' : 'Non valido'}
+                  </Tag>
+                </div>
+                <div className="deck-tile__meters">
+                  <MeterStat label="Carte" value={summary.count} max={DECK_SIZE} />
+                  <MeterStat
+                    label="Forza"
+                    value={summary.power}
+                    max={MAX_POWER}
+                    className={summary.power > MAX_POWER ? 'is-over' : ''}
+                  />
+                </div>
+                <Link className="button button--secondary deck-tile__edit" to={`/mazzi/${deck.id}`}>
+                  <Icon name="edit" size={14} />
+                  Modifica<span className="visually-hidden"> {deck.name}</span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
       )}
     </div>
-  );
-}
-
-function DeckList({ decks, loadError, actionError, onEdit, onDelete }) {
-  if (loadError) {
-    return (
-      <p className="mazzi-alert" role="alert">
-        {LOAD_ERROR}
-      </p>
-    );
-  }
-
-  if (decks === null) {
-    return <p className="mazzi-status">Caricamento dei mazzi…</p>;
-  }
-
-  if (decks.length === 0) {
-    return (
-      <p className="mazzi-status">Non hai ancora nessun mazzo. Creane uno con “Nuovo mazzo”.</p>
-    );
-  }
-
-  return (
-    <>
-      {actionError && (
-        <p className="mazzi-alert" role="alert">
-          {actionError}
-        </p>
-      )}
-      <ul className="mazzi-list" role="list">
-        {decks.map((deck) => (
-          <li key={deck.id} className="mazzi-deck">
-            <div>
-              <p className="mazzi-deck__name">{deck.name}</p>
-              <p className="mazzi-deck__meta">
-                {deck.cardCount} carte · creato il {formatDate(deck.createdAt)}
-              </p>
-            </div>
-            <div className="mazzi-deck__actions">
-              <button
-                type="button"
-                className="button button--secondary"
-                onClick={() => onEdit(deck.id)}
-              >
-                Modifica
-              </button>
-              <button
-                type="button"
-                className="button button--secondary"
-                onClick={() => onDelete(deck)}
-              >
-                Elimina
-              </button>
-              <Link className="button" to="/sfide">
-                Sfida con questo mazzo
-              </Link>
-            </div>
-          </li>
-        ))}
-      </ul>
-    </>
   );
 }

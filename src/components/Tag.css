@@ -30,6 +30,17 @@
   --tag-color: var(--color-rarity-leggendaria);
 }
 
+/* Stato di validità (es. mazzo "Non valido" / "Valido", "2 problemi") */
+.tag--alert {
+  --tag-color: var(--color-accent-highlight);
+  background: transparent;
+}
+
+.tag--success {
+  --tag-color: var(--color-rarity-rara);
+  background: transparent;
+}
+
 /* Solo bordo, senza tinta (Figma: Tag tone=neutral; es. numero di copie, classe) */
 .tag--outline {
   --tag-color: var(--color-border-strong);

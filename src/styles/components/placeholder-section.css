@@ -1,0 +1,75 @@
+/*
+ * Blocco segnaposto per le sezioni non ancora progettate (mock-up).
+ *   <div class="placeholder-section">
+ *     <span class="placeholder-section__badge">In arrivo</span>
+ *     <p class="placeholder-section__text">…</p>
+ *     <div class="placeholder-section__lines" aria-hidden="true">
+ *       <span class="placeholder-section__line"></span>
+ *       <span class="placeholder-section__line"></span>
+ *     </div>
+ *   </div>
+ */
+.placeholder-section {
+  --cut: var(--cut-md);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  border: 2px dashed var(--color-border-strong);
+  background-color: var(--color-background-surface);
+  background-image: repeating-linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-border-default) 60%, transparent) 0 1px,
+    transparent 1px 14px
+  );
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - var(--cut)),
+    calc(100% - var(--cut)) 100%,
+    0 100%
+  );
+}
+
+.placeholder-section__badge {
+  align-self: flex-start;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-accent-link);
+  border-radius: var(--radius-sm);
+  color: var(--color-accent-link);
+  font-family: var(--font-display);
+  font-size: var(--font-size-xs);
+  letter-spacing: var(--letter-spacing-eyebrow);
+  text-transform: uppercase;
+}
+
+.placeholder-section__text {
+  color: var(--color-text-muted);
+}
+
+.placeholder-section__lines {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.placeholder-section__line {
+  display: block;
+  height: 0.625rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-border-strong);
+}
+
+.placeholder-section__line:nth-child(1) {
+  width: 100%;
+}
+
+.placeholder-section__line:nth-child(2) {
+  width: 72%;
+}
+
+.placeholder-section__line:nth-child(3) {
+  width: 45%;
+}

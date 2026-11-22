@@ -128,7 +128,7 @@
 }
 
 /*
- * Il ventaglio è disegnato a 1606×500px (Figma) e si scala con --fan-scale.
+ * Il ventaglio si scala con --fan-scale.
  * Ogni carta riceve via HTML la posizione orizzontale (--x) e la rotazione (--r).
  */
 .card-fan {
@@ -143,7 +143,7 @@
   top: 50%;
   left: 50%;
   width: 256px;
-  aspect-ratio: 256 / 341;
+  aspect-ratio: 412 / 668;
   transform: translate(-50%, -50%) translateX(calc(var(--x) * var(--fan-scale))) rotate(var(--r))
     scale(var(--fan-scale));
 }
@@ -168,29 +168,48 @@
   z-index: 4;
 }
 
-/* Strati della carta: illustrazione, cornice di rarità, simbolo di fazione */
+/* Strati della carta: illustrazione, cornice, emblema di fazione, emblema combattente */
 .fan-card img {
   position: absolute;
+  display: block;
 }
 
+/* Illustrazione: dietro la cornice, dentro la finestra centrale */
 .fan-card__art {
-  top: 17.9%;
-  left: 7.81%;
-  width: 84.38%;
-  aspect-ratio: 1402 / 1122;
+  z-index: 1;
+  top: 10.5%;
+  left: 5%;
+  width: 90%;
+  height: 62%;
   object-fit: cover;
+  object-position: center top;
 }
 
 .fan-card__frame {
+  z-index: 2;
   inset: 0;
   width: 100%;
   height: 100%;
 }
 
+/* Emblema di fazione: nel cerchio in alto a sinistra */
 .fan-card__faction {
-  top: 8.8%;
-  left: 11.72%;
-  width: 9.77%;
+  z-index: 3;
+  top: 2.5%;
+  left: 4%;
+  width: 22%;
+  height: 13.6%;
+  object-fit: contain;
+}
+
+/* Emblema combattente: nello slot a parallelogramma in alto a destra */
+.fan-card__class {
+  z-index: 3;
+  top: 2.3%;
+  left: 73%;
+  width: 23%;
+  height: 12.5%;
+  object-fit: contain;
 }
 
 /* ---------- Come funziona ---------- */
@@ -215,6 +234,46 @@
 .step-grid {
   display: grid;
   gap: var(--space-5);
+}
+
+/* Card con immagine: la foto riempie tutta la card, il testo sta in basso sopra la foto */
+.step-card.step-card--image {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end; /* testo in basso */
+  min-height: 18rem; /* altezza minima su mobile/tablet */
+  padding: 0;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.step-card__image {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Sfumatura scura sotto il testo per leggerlo bene */
+.step-card--image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--color-background-page) 92%, transparent) 0%,
+    color-mix(in srgb, var(--color-background-page) 55%, transparent) 40%,
+    transparent 75%
+  );
+}
+
+.step-card__content {
+  padding: var(--space-5) var(--space-6) var(--space-6);
 }
 
 /* ---------- Fazioni ---------- */
@@ -243,6 +302,21 @@
 
 .faction-list li {
   scroll-snap-align: start;
+}
+
+.faction-card {
+  display: block;
+  padding: 0;
+  background: none;
+  border: 0;
+  clip-path: none;
+  overflow: visible;
+}
+
+.faction-card img {
+  display: block;
+  width: 100%;
+  height: auto; /* l'immagine tiene le sue proporzioni, senza bande */
 }
 
 /* ---------- Teaser trofei ---------- */
@@ -420,6 +494,7 @@
   .faction-list {
     grid-auto-flow: row;
     grid-template-columns: repeat(5, 1fr);
+    gap: var(--space-3);
     overflow: visible;
     padding-bottom: 0;
   }

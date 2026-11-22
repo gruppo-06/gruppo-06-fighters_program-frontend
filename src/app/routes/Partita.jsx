@@ -33,10 +33,14 @@ export default function Partita() {
 
     let active = true;
 
-    Promise.all([api.get(`/matches/${encodeURIComponent(matchId)}`), currentPlayer()])
-      .then(([replay, player]) => {
+    Promise.all([
+      api.get(`/matches/${encodeURIComponent(matchId)}`),
+      currentPlayer(),
+      api.get('/subcards').catch(() => []),
+    ])
+      .then(([replay, player, subcards]) => {
         if (!active) return;
-        const match = toBattle(replay, player.nickname);
+        const match = toBattle(replay, player.nickname, subcards);
         setPhase('matchmaking');
         setReplayKey((key) => key + 1);
         setLoaded({ matchId, match, error: null });

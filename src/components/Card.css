@@ -1,0 +1,89 @@
+.card {
+  --card-rarity: var(--color-rarity-comune);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--color-background-surface);
+  border: 2px solid var(--card-rarity);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.card--rare {
+  --card-rarity: var(--color-rarity-rara);
+}
+
+.card--epic {
+  --card-rarity: var(--color-rarity-epica);
+}
+
+.card--legendary {
+  --card-rarity: var(--color-rarity-leggendaria);
+}
+
+.card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.card__name {
+  font-size: var(--font-size-base);
+}
+
+.card__cost {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--card-rarity);
+  color: var(--color-background-page);
+  font-weight: 800;
+}
+
+.card__art {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 3;
+  background: var(--color-background-placeholder);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-2xl);
+  overflow: hidden;
+}
+
+.card__art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card__meta {
+  display: grid;
+  gap: var(--space-1);
+  font-size: var(--font-size-sm);
+}
+
+.card__meta div {
+  display: flex;
+  justify-content: space-between;
+}
+
+.card__meta dt {
+  color: var(--color-text-muted);
+}
+
+.card__meta dd {
+  margin: 0;
+}
+
+.card__stats {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+}

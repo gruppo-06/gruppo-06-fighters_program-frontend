@@ -1,0 +1,81 @@
+/*
+ * Card di un passaggio (Figma: StepCard). Si adatta alla cella della griglia.
+ *   <article class="step-card">
+ *     [<img class="step-card__image" src="…" alt="" />]   opzionale
+ *     <p class="step-card__number">01</p>
+ *     <h3 class="step-card__title">Apri pacchetti</h3>
+ *     <p class="step-card__text">…</p>
+ *   </article>
+ */
+.step-card {
+  --cut: var(--cut-md);
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  min-height: 15rem;
+  padding: var(--space-6);
+  overflow: hidden;
+  background: var(--color-background-placeholder);
+  border: 1px solid var(--color-border-default);
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - var(--cut)),
+    calc(100% - var(--cut)) 100%,
+    0 100%
+  );
+}
+
+.step-card__image {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Sfumatura verso il basso per leggere il testo */
+.step-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    to bottom,
+    transparent 51%,
+    color-mix(in srgb, var(--color-background-page) 95%, transparent)
+  );
+}
+
+.step-card__number {
+  color: var(--color-accent-highlight);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-eyebrow);
+}
+
+.step-card__title {
+  font-size: var(--font-size-2xl);
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.step-card__text {
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-body);
+}
+
+@media (min-width: 48rem) {
+  .step-card {
+    padding: var(--space-7);
+  }
+
+  .step-card__title {
+    font-size: var(--font-size-3xl);
+  }
+}

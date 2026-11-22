@@ -1,0 +1,50 @@
+/*
+ * Intestazione di sezione (Figma: SectionHeader + Eyebrow).
+ *   <header class="section-header [section-header--center]">
+ *     <p class="eyebrow">Come funziona</p>
+ *     <h2 class="section-header__title">Dal pacchetto alla vittoria</h2>
+ *   </header>
+ */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-accent-highlight);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-eyebrow);
+  text-transform: uppercase;
+}
+
+/* Lineetta prima del testo */
+.eyebrow::before {
+  content: '';
+  width: var(--space-3);
+  height: 2px;
+  background: currentColor;
+}
+
+.section-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.section-header--center {
+  align-items: center;
+  text-align: center;
+}
+
+.section-header__title {
+  font-size: var(--font-size-4xl);
+  line-height: var(--line-height-display);
+  text-transform: uppercase;
+}
+
+@media (min-width: 48rem) {
+  .section-header__title {
+    font-size: var(--font-size-5xl);
+  }
+}

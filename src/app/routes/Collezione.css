@@ -124,7 +124,7 @@
   line-height: 1.45;
 }
 
-.collection-empty {
+.collection-status {
   padding: var(--space-12) var(--space-4);
   border: 1px dashed var(--color-border-default);
   color: var(--color-text-muted);

@@ -10,6 +10,7 @@ import { Navigate, createBrowserRouter } from 'react-router-dom';
 import AppLayout from './layout/AppLayout.jsx';
 import RequireAuth from './RequireAuth.jsx';
 import Accesso from './routes/Accesso.jsx';
+import AperturaPacchetto from './routes/AperturaPacchetto.jsx';
 import Collezione from './routes/Collezione.jsx';
 import Negozio from './routes/Negozio.jsx';
 import NotFound from './routes/NotFound.jsx';
@@ -29,6 +30,15 @@ export const router = createBrowserRouter(
       element: (
         <RequireAuth>
           <Partita />
+        </RequireAuth>
+      ),
+    },
+    // Apertura pacchetto: come Partita, a tutta pagina e fuori da AppLayout
+    {
+      path: '/negozio/apertura',
+      element: (
+        <RequireAuth>
+          <AperturaPacchetto />
         </RequireAuth>
       ),
     },

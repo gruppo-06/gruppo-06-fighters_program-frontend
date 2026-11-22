@@ -1,11 +1,14 @@
 /** Negozio dei pacchetti (Figma: NEGOZIO). */
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import PackCard, { PackContents } from '../../components/PackCard.jsx';
-import PackReveal from '../../components/PackReveal.jsx';
 import Price from '../../components/Price.jsx';
-import { api } from '../../services/api.js';
+import { ApiError, api } from '../../services/api.js';
+import { toFighter } from '../../services/cards.js';
 import { notifyCreditsChanged } from '../../services/auth.js';
+import { useCredits } from '../useCredits.js';
+import DettaglioPacchetto from './negozio/DettaglioPacchetto.jsx';
 import './Negozio.css';
 
 /** Chiave di idempotenza per l'apertura di un pacchetto. */
@@ -17,15 +20,16 @@ function newIdempotencyKey() {
 }
 
 export default function Negozio() {
+  const navigate = useNavigate();
   const [packs, setPacks] = useState([]);
-  // null finché non arriva la risposta di GET /me/credits
-  const [credits, setCredits] = useState(null);
+  const credits = useCredits();
   const [daily, setDaily] = useState(null);
   const [claiming, setClaiming] = useState(false);
-  const [pendingPackId, setPendingPackId] = useState(null);
+  const [selectedPack, setSelectedPack] = useState(null);
+  const [purchasingPackId, setPurchasingPackId] = useState(null);
+  const [purchaseError, setPurchaseError] = useState(null);
   const [error, setError] = useState(null);
-  const [opening, setOpening] = useState(null);
-  // Una chiave per pacchetto: se la richiesta fallisce, il nuovo tentativo riusa la stessa.
+  // Una chiave per pacchetto: se la richiesta fallisce per rete, il nuovo tentativo riusa la stessa.
   const idempotencyKeys = useRef(new Map());
 
   // Il banner in evidenza è sempre il pacchetto più costoso.
@@ -39,9 +43,8 @@ export default function Negozio() {
     let cancelled = false;
 
     async function load() {
-      const [packsResult, creditsResult, dailyResult] = await Promise.allSettled([
+      const [packsResult, dailyResult] = await Promise.allSettled([
         api.get('/packs'),
-        api.get('/me/credits'),
         api.get('/me/credits/daily'),
       ]);
       if (cancelled) return;
@@ -50,9 +53,6 @@ export default function Negozio() {
         setPacks(packsResult.value ?? []);
       } else {
         setError('Impossibile caricare i pacchetti. Riprova più tardi.');
-      }
-      if (creditsResult.status === 'fulfilled') {
-        setCredits(creditsResult.value?.balance ?? null);
       }
       if (dailyResult.status === 'fulfilled') {
         setDaily(dailyResult.value);
@@ -72,15 +72,10 @@ export default function Negozio() {
     setError(null);
     try {
       await api.post('/me/credits/daily');
-
-      const [creditsResult, dailyResult] = await Promise.allSettled([
-        api.get('/me/credits'),
-        api.get('/me/credits/daily'),
-      ]);
-      if (creditsResult.status === 'fulfilled') setCredits(creditsResult.value.balance);
-      if (dailyResult.status === 'fulfilled') setDaily(dailyResult.value);
-
       notifyCreditsChanged();
+
+      const [dailyResult] = await Promise.allSettled([api.get('/me/credits/daily')]);
+      if (dailyResult.status === 'fulfilled') setDaily(dailyResult.value);
     } catch {
       setError('Impossibile ritirare il bonus. Riprova più tardi.');
     } finally {
@@ -88,8 +83,8 @@ export default function Negozio() {
     }
   }
 
-  async function handleBuy(pack) {
-    if (pendingPackId != null) return;
+  async function handlePurchase(pack) {
+    if (purchasingPackId != null) return;
 
     let idempotencyKey = idempotencyKeys.current.get(pack.id);
     if (!idempotencyKey) {
@@ -97,24 +92,49 @@ export default function Negozio() {
       idempotencyKeys.current.set(pack.id, idempotencyKey);
     }
 
-    setPendingPackId(pack.id);
-    setError(null);
+    setPurchasingPackId(pack.id);
+    setPurchaseError(null);
     try {
+      // Le carte già possedute servono a capire quali sono nuove
+      const collection = await api.get('/me/collection?size=100');
+      const ownedCodes = new Set(
+        collection.content.filter((item) => item.quantity > 0).map((item) => item.code),
+      );
+
       const result = await api.post(`/packs/${pack.id}/open`, undefined, {
         headers: { 'Idempotency-Key': idempotencyKey },
       });
       idempotencyKeys.current.delete(pack.id);
-      setCredits(result.balance);
+
+      const codes = [...new Set(result.cards.map((card) => card.code))];
+      const details = new Map();
+      const settled = await Promise.allSettled(
+        codes.map((code) => api.get(`/cards/${encodeURIComponent(code)}`)),
+      );
+      settled.forEach((detail, index) => {
+        if (detail.status === 'fulfilled') details.set(codes[index], detail.value);
+      });
+
+      const cards = result.cards.map((card) => ({
+        ...toFighter(details.get(card.code) ?? card),
+        isNew: !ownedCodes.has(card.code),
+      }));
+
       notifyCreditsChanged();
-      setOpening(result);
+      navigate('/negozio/apertura', {
+        state: {
+          opening: { id: result.openingId, pack, cards, trophy: null, balance: result.balance },
+        },
+      });
     } catch (err) {
-      setError(
+      if (err instanceof ApiError) idempotencyKeys.current.delete(pack.id);
+      setPurchaseError(
         err?.status === 402
           ? 'Crediti insufficienti per questo pacchetto'
           : 'Non è stato possibile aprire il pacchetto. Riprova più tardi.',
       );
     } finally {
-      setPendingPackId(null);
+      setPurchasingPackId(null);
     }
   }
 
@@ -184,10 +204,9 @@ export default function Negozio() {
             <button
               type="button"
               className="button button--lg"
-              onClick={() => handleBuy(featured)}
-              disabled={pendingPackId === featured.id}
+              onClick={() => setSelectedPack(featured)}
             >
-              {pendingPackId === featured.id ? 'Apertura…' : 'Apri ora'}
+              Apri ora
               <Icon name="arrow-right" size={16} />
             </button>
           </div>
@@ -206,15 +225,27 @@ export default function Negozio() {
             <li key={pack.id}>
               <PackCard
                 {...pack}
-                onBuy={() => handleBuy(pack)}
-                buying={pendingPackId === pack.id}
+                onBuy={() => setSelectedPack(pack)}
+                buying={purchasingPackId === pack.id}
               />
             </li>
           ))}
         </ul>
       </section>
 
-      <PackReveal opening={opening} onClose={() => setOpening(null)} />
+      {selectedPack && (
+        <DettaglioPacchetto
+          pack={selectedPack}
+          credits={credits}
+          purchasing={purchasingPackId === selectedPack.id}
+          error={purchaseError}
+          onClose={() => {
+            setSelectedPack(null);
+            setPurchaseError(null);
+          }}
+          onPurchase={handlePurchase}
+        />
+      )}
     </div>
   );
 }

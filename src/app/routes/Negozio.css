@@ -176,15 +176,6 @@
   margin-bottom: 6px;
 }
 
-.shop-featured .button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.shop-featured .button:disabled:hover {
-  background: var(--color-accent-primary);
-}
-
 .shop-featured__actions {
   display: flex;
   flex-wrap: wrap;

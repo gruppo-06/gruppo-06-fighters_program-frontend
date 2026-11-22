@@ -3,12 +3,9 @@
  * Il risultato arriva dallo state della navigazione: ricaricando non si paga di nuovo.
  */
 import { useEffect, useRef } from 'react';
-import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation } from 'react-router-dom';
 import FighterCard from '../../components/FighterCard.jsx';
-import Icon from '../../components/Icon.jsx';
 import Tag from '../../components/Tag.jsx';
-import { purchasePack } from '../../data/mockShop.js';
-import { useCredits } from '../useCredits.js';
 import './AperturaPacchetto.css';
 
 const RARITIES = [
@@ -20,8 +17,6 @@ const RARITIES = [
 
 // Il ventaglio del mockup è disegnato per 5 carte; con altre quantità si usa una griglia
 const FAN_SIZE = 5;
-
-const numberFormat = new Intl.NumberFormat('it-IT');
 
 /** Es. "3 comuni", "1 epica · nuova". */
 function summarize(cards) {
@@ -40,18 +35,13 @@ export default function AperturaPacchetto() {
 
   if (!opening) return <Navigate to="/negozio" replace />;
 
-  // La key azzera focus e blocco del bottone a ogni nuova apertura
+  // La key azzera il focus a ogni nuova apertura
   return <Apertura key={opening.id} opening={opening} />;
 }
 
 function Apertura({ opening }) {
-  const { pack, cards, trophy } = opening;
-  const navigate = useNavigate();
-  const credits = useCredits();
+  const { pack, cards } = opening;
   const titleRef = useRef(null);
-  // Un ref e non uno state: deve bloccare anche un secondo click prima del nuovo render
-  const purchasedRef = useRef(false);
-  const affordable = credits >= pack.price;
   const layout = cards.length === FAN_SIZE ? 'fan' : 'grid';
 
   useEffect(() => {
@@ -59,17 +49,11 @@ function Apertura({ opening }) {
     titleRef.current.focus({ preventScroll: true });
   }, []);
 
-  function openAnother() {
-    if (purchasedRef.current) return;
-    purchasedRef.current = true;
-    navigate('/negozio/apertura', { replace: true, state: { opening: purchasePack(pack) } });
-  }
-
   return (
     <main className="pack-opening">
       <p className="eyebrow">{pack.name} · aperto</p>
       <h1 ref={titleRef} className="pack-opening__title" tabIndex={-1}>
-        {cards.length} nuove carte per te
+        {cards.length} carte per te
       </h1>
 
       <ul
@@ -92,40 +76,14 @@ function Apertura({ opening }) {
         ))}
       </ul>
 
-      {trophy && (
-        <div className="pack-opening__trophy">
-          <span className="pack-opening__trophy-badge">
-            <Icon name="trophy" size={18} />
-          </span>
-          <div className="pack-opening__trophy-text">
-            <p className="pack-opening__trophy-title">Trofeo sbloccato · {trophy.title}</p>
-            <p className="pack-opening__trophy-reward">
-              +{trophy.reward} crediti aggiunti al saldo
-            </p>
-            <p className="pack-opening__trophy-status">Sbloccato · +{trophy.reward}</p>
-          </div>
-        </div>
-      )}
-
       <div className="pack-opening__actions">
+        <Link className="button button--lg" to="/negozio">
+          Apri un altro pacchetto
+        </Link>
         <Link className="button button--secondary button--lg" to="/collezione">
           Vai alla collezione
         </Link>
-        <button
-          type="button"
-          className="button button--lg pack-opening__again"
-          disabled={!affordable}
-          onClick={openAnother}
-        >
-          <span>
-            Apri un altro · <span className="pack-opening__coin" aria-hidden="true" />{' '}
-            {numberFormat.format(pack.price)}
-            <span className="visually-hidden"> crediti</span>
-          </span>
-        </button>
       </div>
-
-      {!affordable && <p className="pack-opening__error">Crediti insufficienti</p>}
     </main>
   );
 }

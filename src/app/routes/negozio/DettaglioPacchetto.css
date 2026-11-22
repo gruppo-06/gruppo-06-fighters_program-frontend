@@ -127,18 +127,7 @@ html:has(.pack-dialog[open]) {
   );
 }
 
-.pack-dialog__labels {
-  display: flex;
-  gap: var(--space-2);
-}
-
-.pack-dialog .tag:not(.tag--elemento) {
-  background: color-mix(in srgb, var(--tag-color) 15%, transparent);
-}
-
-.pack-dialog__availability,
 .pack-dialog__stat-label,
-.pack-dialog__notes,
 .pack-dialog__balance,
 .pack-dialog__error {
   color: var(--color-text-muted);
@@ -247,17 +236,6 @@ html:has(.pack-dialog[open]) {
 .pack-dialog__legend dd {
   font-weight: var(--font-weight-semibold);
   white-space: nowrap;
-}
-
-.pack-dialog__notes {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  padding-left: 21px;
-}
-
-.pack-dialog__notes li::marker {
-  font-size: 0.65em;
 }
 
 /* ---------- Acquisto ---------- */

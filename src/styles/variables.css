@@ -24,6 +24,10 @@
   --color-accent-highlight: #ee8b7d;
   --color-accent-link: #c4984f;
 
+  /* Stati: successo (verde) e allerta (rosso) */
+  --color-success: #7cc4a0;
+  --color-alert: #ee8b7d;
+
   /* Rarità */
   --color-rarity-comune: #9ea3ad;
   --color-rarity-rara: #7cc4a0;

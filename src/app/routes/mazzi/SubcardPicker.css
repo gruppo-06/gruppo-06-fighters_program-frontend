@@ -1,0 +1,98 @@
+/* Scelta della sottocarta per uno slot libero (Figma: MAZZI – scelta sottocarta). */
+
+.subcard-picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-background-surface);
+  box-shadow: 0 var(--space-2) var(--space-4) rgb(0 0 0 / 35%);
+}
+
+.subcard-picker__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.subcard-picker__title {
+  color: var(--color-accent-highlight);
+  font-family: var(--font-body);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-eyebrow);
+  text-transform: uppercase;
+}
+
+.subcard-picker__close {
+  display: inline-flex;
+  padding: var(--space-1);
+  border: 0;
+  background: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: color var(--transition);
+}
+
+.subcard-picker__close:hover {
+  color: var(--color-text-primary);
+}
+
+.subcard-picker__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.subcard-picker__option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border-default);
+  background: var(--color-background-surface-sunken);
+  color: var(--color-text-primary);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--transition);
+}
+
+.subcard-picker__option:hover,
+.subcard-picker__option:focus-visible {
+  border-color: var(--color-accent-highlight);
+  outline: none;
+}
+
+.subcard-picker__name {
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+}
+
+.subcard-picker__description,
+.subcard-picker__empty {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.subcard-picker__effects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-1);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.subcard-picker__effects .is-up {
+  color: var(--color-success);
+}
+
+.subcard-picker__effects .is-down {
+  color: var(--color-alert);
+}

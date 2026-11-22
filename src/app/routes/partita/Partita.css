@@ -366,6 +366,17 @@
   width: min(100%, 15.5rem);
 }
 
+/* Modalità avanzata: sottocarte applicate alla carta, sotto la carta */
+.combatant__subcards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+  max-width: min(100%, 15.5rem);
+  padding: 0;
+  list-style: none;
+}
+
 /* Modalità avanzata: etichette sopra la carta (primo colpo, schivata, critico) */
 .combatant__flags {
   position: absolute;

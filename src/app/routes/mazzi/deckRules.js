@@ -25,6 +25,23 @@ export const CARD_POWER = {
   leggendaria: 5,
 };
 
+/** Sottocarte applicabili a una carta per rarità (solo modalità avanzata). */
+export const SUBCARD_SLOTS = {
+  comune: 3,
+  rara: 2,
+  epica: 1,
+  leggendaria: 0,
+};
+
+/** Statistiche delle carte nell'ordine di visualizzazione, con i limiti del backend. */
+const STAT_ROWS = [
+  { key: 'atk', label: 'ATK', min: 1 },
+  { key: 'def', label: 'DEF', min: 0 },
+  { key: 'vel', label: 'VEL', min: 0 },
+  { key: 'crt', label: 'CRT', min: 0 },
+];
+const MAX_STAT = 1000;
+
 /** Voci della "Composizione" nel pannello del mazzo, nell'ordine del mockup. */
 export const COMPOSITION = [
   { rarity: 'comune', label: 'Comuni' },
@@ -124,4 +141,46 @@ export function addBlockReason(card, inDeck, summary) {
   }
   if (summary.count >= DECK_SIZE) return 'Mazzo completo';
   return null;
+}
+
+export const subcardSlots = (card) => SUBCARD_SLOTS[card.rarity] ?? 0;
+
+/** Si può applicare la sottocarta `code` alla carta, dato l'elenco `codes` già applicato? */
+export const canAddSubcard = (card, codes, code) =>
+  !codes.includes(code) && codes.length < subcardSlots(card);
+
+/**
+ * Statistiche con le sottocarte applicate, come le calcola il backend:
+ * stat' = round(stat × (100 + somma delle percentuali) / 100),
+ * limitata a 1..1000 per ATK e 0..1000 per le altre.
+ * Le statistiche non numeriche (es. VEL e CRT delle carte non più in collezione) restano invariate.
+ *
+ * @param {object} stats     { atk, def, vel, crt }
+ * @param {object[]} subcards sottocarte { atk, def, vel, crt } in percentuale
+ */
+export function modifiedStats(stats, subcards = []) {
+  const modified = { ...stats };
+  for (const { key, min } of STAT_ROWS) {
+    if (typeof stats?.[key] !== 'number') continue;
+    const percent = subcards.reduce((sum, subcard) => sum + (subcard[key] ?? 0), 0);
+    const value = Math.round((stats[key] * (100 + percent)) / 100);
+    modified[key] = Math.min(MAX_STAT, Math.max(min, value));
+  }
+  return modified;
+}
+
+/** Statistiche che cambiano con le sottocarte: { label, from, to }. */
+export function changedStats(stats, modified) {
+  return STAT_ROWS.filter(
+    ({ key }) => typeof stats?.[key] === 'number' && modified[key] !== stats[key],
+  ).map(({ key, label }) => ({ label, from: stats[key], to: modified[key] }));
+}
+
+/** Effetti non nulli di una sottocarta, nell'ordine ATK DEF VEL CRT. */
+export function subcardEffects(subcard) {
+  return STAT_ROWS.filter(({ key }) => (subcard[key] ?? 0) !== 0).map(({ key, label }) => ({
+    key,
+    label,
+    value: subcard[key],
+  }));
 }

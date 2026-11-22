@@ -5,6 +5,7 @@
  * Il backend registra i round dal punto di vista di ONE (challenger) e TWO
  * (opponent); `me` è il lato del giocatore corrente, scelto dal nickname.
  */
+import { modifiedStats } from '../app/routes/mazzi/deckRules.js';
 import { cardImageUrl, toFighter } from './cards.js';
 
 /** Punti vita iniziali del backend. */
@@ -45,6 +46,20 @@ function toReplayFighter(snapshot) {
       vel: fighter.stats.vel ?? MISSING_STAT,
       crt: fighter.stats.crt ?? MISSING_STAT,
     },
+    subcardNames: snapshot.subcardNames ?? [],
+  };
+}
+
+/**
+ * Snapshot con le sottocarte della modalità avanzata applicate: statistiche modificate
+ * e nomi delle sottocarte. Un codice non presente nel catalogo resta visibile come codice.
+ */
+function applySubcards(snapshot, catalog) {
+  const codes = snapshot.subcards ?? [];
+  const found = codes.map((code) => catalog.find((subcard) => subcard.code === code));
+  return {
+    ...modifiedStats(snapshot, found.filter(Boolean)),
+    subcardNames: codes.map((code, i) => found[i]?.name ?? code),
   };
 }
 
@@ -67,6 +82,12 @@ function toCombatant(deck, fighter, damage, ko) {
   };
 }
 
+/** Mazzo del replay pronto per la battaglia: nelle partite base le sottocarte non contano. */
+function prepareDeck(deck, mode, catalog) {
+  if (mode !== 'ADVANCED') return deck;
+  return (deck ?? []).map((snapshot) => applySubcards(snapshot, catalog));
+}
+
 /** Carte ancora nel mazzo dopo quella schierata. */
 function remainingCards(deck, fighter) {
   return Math.max(0, (deck?.length ?? 0) - (fighter?.deckPosition ?? 0) - 1);
@@ -77,8 +98,10 @@ function remainingCards(deck, fighter) {
  *
  * @param {object} replay risposta di GET /matches/{id}
  * @param {string} myNickname nickname del giocatore corrente
+ * @param {{ code, name, atk, def, vel, crt }[]} [subcardCatalog] sottocarte di GET /subcards,
+ *        usate per le statistiche nelle partite avanzate
  */
-export function toBattle(replay, myNickname) {
+export function toBattle(replay, myNickname, subcardCatalog = []) {
   const { log } = replay;
   if (replay.status !== 'FINISHED' || !log?.turns?.length || !log.summary) {
     throw new Error('La partita non è ancora disponibile per il replay.');
@@ -86,6 +109,10 @@ export function toBattle(replay, myNickname) {
 
   const summary = log.summary;
   const mode = replay.mode ?? log.mode;
+  const decks = {
+    ONE: prepareDeck(replay.challengerDeck, mode, subcardCatalog),
+    TWO: prepareDeck(replay.opponentDeck, mode, subcardCatalog),
+  };
   // Se il nickname non corrisponde a nessuno dei due, mostra il challenger come "me".
   const me =
     replay.challengerNickname === myNickname
@@ -96,8 +123,8 @@ export function toBattle(replay, myNickname) {
   const opponent = OTHER_SIDE[me];
   const meNickname = me === 'ONE' ? replay.challengerNickname : replay.opponentNickname;
   const opponentNickname = me === 'ONE' ? replay.opponentNickname : replay.challengerNickname;
-  const meDeck = me === 'ONE' ? replay.challengerDeck : replay.opponentDeck;
-  const opponentDeck = me === 'ONE' ? replay.opponentDeck : replay.challengerDeck;
+  const meDeck = decks[me];
+  const opponentDeck = decks[opponent];
   const defeated = { me: 0, opponent: 0 };
 
   const events = log.turns.map((turn) => {
@@ -139,8 +166,7 @@ export function toBattle(replay, myNickname) {
   });
 
   const cards = summary.cards.map((card) => {
-    const deck = card.player === 'ONE' ? replay.challengerDeck : replay.opponentDeck;
-    const snapshot = findSnapshot(deck, card);
+    const snapshot = findSnapshot(card.player === 'ONE' ? decks.ONE : decks.TWO, card);
     if (!snapshot) {
       throw new Error(`Carta ${card.cardCode} non trovata nel mazzo del replay.`);
     }

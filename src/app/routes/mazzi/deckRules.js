@@ -1,29 +1,28 @@
 /**
  * Regole di composizione del mazzo (Figma: MAZZI – editor).
- * Logica pura, senza React: la usano l'editor e l'elenco dei mazzi,
- * e un domani si può confrontare 1:1 con la validazione del backend.
+ * Logica pura, senza React: la usano l'editor e l'elenco dei mazzi.
+ * Le regole vere le applica il backend (POST /me/decks/validate), qui servono
+ * per i contatori dal vivo e per impedire le mosse non consentite nell'editor.
  *
- * Un mazzo è rappresentato da `cards`: un oggetto { [idCarta]: numeroCopie }.
- *
- * TODO: il regolamento (regolamento.html) non definisce ancora la composizione del mazzo:
- * i valori qui sotto vengono dal mockup e i punti forza per rarità sono provvisori.
+ * Un mazzo è rappresentato da `cards`: un oggetto { [cardId]: numeroCopie }.
+ * Le chiavi sono i cardId del backend (stringhe), non i numeri di carta.
  */
 
 /** Segmento di rotta dell'editor per creare un mazzo nuovo: /mazzi/nuovo. */
 export const NEW_DECK_ID = 'nuovo';
 
-export const DECK_SIZE = 20;
-export const MAX_POWER = 150;
-export const MAX_COPIES = 3;
+export const DECK_SIZE = 10;
+export const MAX_POWER = 18;
+export const MAX_COPIES = 2;
+export const MAX_EPIC = 2;
 export const MAX_LEGENDARY = 1;
 
-/** Punti forza di una carta in base alla rarità (provvisori, vedi TODO sopra). */
+/** Punti forza di una carta in base alla rarità. */
 export const CARD_POWER = {
-  comune: 6,
-  rara: 9,
-  epica: 12,
-  leggendaria: 16,
-  effetto: 5,
+  comune: 1,
+  rara: 2,
+  epica: 3,
+  leggendaria: 5,
 };
 
 /** Voci della "Composizione" nel pannello del mazzo, nell'ordine del mockup. */
@@ -32,10 +31,10 @@ export const COMPOSITION = [
   { rarity: 'rara', label: 'Rare' },
   { rarity: 'epica', label: 'Epiche' },
   { rarity: 'leggendaria', label: 'Leggendarie' },
-  { rarity: 'effetto', label: 'Carte Effetto' },
 ];
 
 export const isLegendary = (card) => card.rarity === 'leggendaria';
+export const isEpic = (card) => card.rarity === 'epica';
 
 export const cardPower = (card) => CARD_POWER[card.rarity] ?? 0;
 
@@ -43,19 +42,33 @@ export const cardPower = (card) => CARD_POWER[card.rarity] ?? 0;
 export const copyLimit = (card) => (isLegendary(card) ? MAX_LEGENDARY : MAX_COPIES);
 
 /** Copie inseribili davvero: il limite del regolamento, ma non più di quelle possedute. */
-export const maxCopies = (card) => (card.owned ? Math.min(copyLimit(card), card.copies) : 0);
+export const maxCopies = (card) => (card.owned ? Math.min(copyLimit(card), card.copies ?? 0) : 0);
+
+const cardKey = (id) => String(id);
+const sortKey = (card) => String(card.number ?? card.id ?? card.cardId ?? '');
+
+/** Cerca la carta accettando sia chiavi stringa sia numeriche nella mappa. */
+const cardFrom = (cardsById, id) =>
+  cardsById.get(cardKey(id)) ?? cardsById.get(id) ?? cardsById.get(Number(id));
 
 /** Righe del mazzo { card, count } ordinate per numero di carta. Ignora id sconosciuti. */
 export function deckEntries(cards, cardsById) {
   return Object.entries(cards)
-    .map(([id, count]) => ({ card: cardsById.get(Number(id)), count }))
+    .map(([id, count]) => ({ card: cardFrom(cardsById, id), count }))
     .filter(({ card, count }) => card && count > 0)
-    .sort((a, b) => a.card.id - b.card.id);
+    .sort(
+      (a, b) =>
+        sortKey(a.card).localeCompare(sortKey(b.card), 'it', { numeric: true }) ||
+        cardKey(a.card.cardId).localeCompare(cardKey(b.card.cardId)),
+    );
 }
 
 /**
- * Riepilogo e validazione di un mazzo.
- * @returns {{ count, power, legendaries, composition, problems: string[], valid: boolean }}
+ * Riepilogo e validazione locale di un mazzo.
+ * Il backend resta la fonte di verità: questo riepilogo alimenta i contatori
+ * dal vivo e i messaggi mostrati accanto alla verifica del server.
+ *
+ * @returns {{ count, power, legendaries, epics, composition, problems: string[], valid: boolean }}
  */
 export function summarizeDeck(cards, cardsById) {
   const entries = deckEntries(cards, cardsById);
@@ -63,6 +76,7 @@ export function summarizeDeck(cards, cardsById) {
   let count = 0;
   let power = 0;
   let legendaries = 0;
+  let epics = 0;
   const composition = Object.fromEntries(COMPOSITION.map(({ rarity }) => [rarity, 0]));
   const problems = [];
 
@@ -71,7 +85,8 @@ export function summarizeDeck(cards, cardsById) {
     power += cardPower(card) * copies;
     composition[card.rarity] = (composition[card.rarity] ?? 0) + copies;
     if (isLegendary(card)) legendaries += copies;
-    if (copies > maxCopies(card)) problems.push(`Troppe copie di ${card.name}`);
+    if (isEpic(card)) epics += copies;
+    if (copies > copyLimit(card)) problems.push(`Troppe copie di ${card.name}`);
   }
 
   const missing = DECK_SIZE - count;
@@ -79,10 +94,13 @@ export function summarizeDeck(cards, cardsById) {
   else if (missing > 0) problems.unshift(`Mancano ${missing} carte`);
   else if (missing < 0) problems.unshift(`${-missing} carte di troppo`);
 
+  if (epics > MAX_EPIC) problems.push(`Massimo ${MAX_EPIC} carte Epiche`);
+  if (legendaries > MAX_LEGENDARY) {
+    problems.push(`Massimo ${MAX_LEGENDARY} carta Leggendaria`);
+  }
   if (power > MAX_POWER) problems.push(`Forza ${power} / ${MAX_POWER}`);
-  if (legendaries > MAX_LEGENDARY) problems.push(`Massimo ${MAX_LEGENDARY} leggendaria`);
 
-  return { count, power, legendaries, composition, problems, valid: problems.length === 0 };
+  return { count, power, legendaries, epics, composition, problems, valid: problems.length === 0 };
 }
 
 /**
@@ -91,14 +109,18 @@ export function summarizeDeck(cards, cardsById) {
  */
 export function addBlockReason(card, inDeck, summary) {
   if (!card.owned) return 'Non posseduta';
-  if (inDeck >= copyLimit(card)) {
+  if (inDeck >= maxCopies(card)) {
+    const owned = card.copies ?? 0;
+    if (owned < copyLimit(card)) {
+      return owned === 1 ? 'Hai 1 sola copia' : `Hai solo ${owned} copie`;
+    }
     return isLegendary(card) ? `Max ${MAX_LEGENDARY} leggendaria` : `Max ${MAX_COPIES} copie`;
-  }
-  if (inDeck >= card.copies) {
-    return card.copies === 1 ? 'Hai 1 sola copia' : `Hai solo ${card.copies} copie`;
   }
   if (isLegendary(card) && summary.legendaries >= MAX_LEGENDARY) {
     return `Max ${MAX_LEGENDARY} leggendaria`;
+  }
+  if (isEpic(card) && summary.epics >= MAX_EPIC) {
+    return `Max ${MAX_EPIC} carte Epiche`;
   }
   if (summary.count >= DECK_SIZE) return 'Mazzo completo';
   return null;

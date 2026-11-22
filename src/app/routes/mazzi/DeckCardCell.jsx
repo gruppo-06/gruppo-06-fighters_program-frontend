@@ -1,13 +1,15 @@
 import FighterCard from '../../../components/FighterCard.jsx';
 import Icon from '../../../components/Icon.jsx';
-import { copyLimit } from './deckRules.js';
+import { maxCopies } from './deckRules.js';
 
 /**
  * Carta della collezione nell'editor del mazzo (Figma: MAZZI – cella carta).
  * Sotto la carta: indicatore "Nel mazzo n/max" e azione
  * - nessuna copia nel mazzo → "Aggiungi" (o il motivo per cui non si può)
  * - qualche copia → stepper − / + con la cella evidenziata
- * - limite del regolamento raggiunto → carta attenuata + "Max 3 copie" / "Max 1 leggendaria"
+ * - limite di copie possedute o del regolamento raggiunto → carta attenuata e + disabilitato
+ *
+ * Il massimo è min(MAX_COPIES, copie possedute), con il limite di 1 per le Leggendarie.
  *
  * TODO: quando la carta sarà composta a layer (illustrazione, cornice di fazione, …)
  * basta sostituire <FighterCard> qui: il resto della cella non cambia.
@@ -17,21 +19,21 @@ import { copyLimit } from './deckRules.js';
  * @param {string|null} blockReason  motivo per cui non si può aggiungere (null = si può)
  */
 export default function DeckCardCell({ card, inDeck, blockReason, onAdd, onRemove }) {
-  const limit = copyLimit(card);
+  const limit = maxCopies(card);
   const atLimit = inDeck >= limit;
   const canAdd = blockReason === null;
 
   const classes = [
     'deck-cell',
     inDeck > 0 && !atLimit && 'is-in-deck',
-    atLimit && 'is-maxed',
+    atLimit && inDeck > 0 && 'is-maxed',
     !card.owned && 'is-missing',
   ]
     .filter(Boolean)
     .join(' ');
 
   let action;
-  if (inDeck > 0 && !atLimit) {
+  if (inDeck > 0) {
     action = (
       <div className="deck-stepper deck-stepper--cell">
         <button

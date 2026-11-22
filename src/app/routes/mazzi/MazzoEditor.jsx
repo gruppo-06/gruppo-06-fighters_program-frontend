@@ -1,5 +1,5 @@
 /** Editor di un mazzo (Figma: MAZZI – editor). Rotte /mazzi/:deckId e /mazzi/nuovo. */
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Chip, { ChipSelect } from '../../../components/Chip.jsx';
 import Icon from '../../../components/Icon.jsx';
@@ -7,8 +7,8 @@ import MeterStat from '../../../components/MeterStat.jsx';
 import { RARITY_LABELS } from '../../../components/rarity.js';
 import SearchField from '../../../components/SearchField.jsx';
 import Tag from '../../../components/Tag.jsx';
-import { FACTIONS, RARITIES, mockCollection } from '../../../data/mockCollection.js';
-import { mockDecks } from '../../../data/mockDecks.js';
+import { ApiError, api } from '../../../services/api.js';
+import { FACTIONS, RARITIES, toFighter } from '../../../services/cards.js';
 import DeckCardCell from './DeckCardCell.jsx';
 import DeckPanel from './DeckPanel.jsx';
 import {
@@ -22,12 +22,7 @@ import {
 import './Mazzo.css';
 
 const ALL = '';
-
-const TYPES = [
-  { value: ALL, label: 'Tutte' },
-  { value: 'fighter', label: 'Fighter' },
-  { value: 'effetto', label: 'Effetto' },
-];
+const VALIDATION_DELAY = 300;
 
 const FACTION_OPTIONS = [
   { value: ALL, label: 'Tutte' },
@@ -36,43 +31,102 @@ const FACTION_OPTIONS = [
 
 const RARITY_OPTIONS = [
   { value: ALL, label: 'Tutte' },
-  ...RARITIES.filter((rarity) => rarity !== 'effetto').map((value) => ({
-    value,
-    label: RARITY_LABELS[value],
-  })),
+  ...RARITIES.map((value) => ({ value, label: RARITY_LABELS[value] })),
 ];
 
 const RARITY_ORDER = Object.fromEntries(RARITIES.map((rarity, i) => [rarity, i]));
 
+const sortByNumber = (a, b) =>
+  a.number.localeCompare(b.number, 'it', { numeric: true }) ||
+  String(a.cardId).localeCompare(String(b.cardId));
+
 const SORTERS = {
-  [ALL]: { label: 'Numero', compare: (a, b) => a.id - b.id },
+  [ALL]: { label: 'Numero', compare: sortByNumber },
   rarita: {
     label: 'Rarità',
-    compare: (a, b) => RARITY_ORDER[b.rarity] - RARITY_ORDER[a.rarity] || a.id - b.id,
+    compare: (a, b) => RARITY_ORDER[b.rarity] - RARITY_ORDER[a.rarity] || sortByNumber(a, b),
   },
   nome: { label: 'Nome', compare: (a, b) => a.name.localeCompare(b.name, 'it') },
   attacco: {
     label: 'Attacco',
-    compare: (a, b) => (b.stats?.atk ?? -1) - (a.stats?.atk ?? -1) || a.id - b.id,
+    compare: (a, b) => b.stats.atk - a.stats.atk || sortByNumber(a, b),
   },
 };
 
 const SORT_OPTIONS = Object.entries(SORTERS).map(([value, { label }]) => ({ value, label }));
 
-/** Filtro "Mostra": possedute (default), non possedute o tutte (nessuno dei due chip attivo). */
-const OWNED = 'owned';
-const MISSING = 'missing';
+const LOAD_ERROR = 'Impossibile caricare il mazzo. Riprova più tardi.';
+const SAVE_ERROR = 'Impossibile salvare il mazzo. Riprova più tardi.';
+const FULL_ERROR = 'Hai raggiunto il numero massimo di mazzi.';
+
+/** Carta della collezione nella forma usata da FighterCard e dal riepilogo. */
+function collectionCard(card) {
+  return {
+    ...toFighter(card),
+    cardId: card.cardId,
+    owned: (card.quantity ?? 0) > 0,
+  };
+}
+
+/** Carta del dettaglio del mazzo non (più) presente in collezione. */
+function deckCard(card) {
+  return { ...toFighter(card), cardId: card.cardId, owned: false, copies: 0 };
+}
+
+function saveErrorOf(failure) {
+  if (failure instanceof ApiError && failure.status === 422) {
+    return {
+      message: 'Il mazzo non è valido.',
+      details: Array.isArray(failure.data?.details) ? failure.data.details : [],
+    };
+  }
+  if (failure instanceof ApiError && failure.status === 409) {
+    return { message: FULL_ERROR, details: [] };
+  }
+  return { message: SAVE_ERROR, details: [] };
+}
 
 export default function MazzoEditor() {
   const { deckId } = useParams();
+  const isNew = deckId === NEW_DECK_ID;
+  const requestKey = isNew ? NEW_DECK_ID : String(deckId);
 
-  // TODO: caricare il mazzo dal backend (es. api.get(`/decks/${deckId}`)) quando l'endpoint esiste
-  const deck =
-    deckId === NEW_DECK_ID
-      ? { id: null, name: 'Nuovo mazzo', cards: {} }
-      : mockDecks.find((item) => item.id === deckId);
+  // null finché non arrivano le risposte del backend
+  const [result, setResult] = useState(null);
 
-  if (!deck) {
+  useEffect(() => {
+    let cancelled = false;
+
+    Promise.all([
+      api.get('/me/collection?size=100'),
+      isNew ? Promise.resolve(null) : api.get(`/me/decks/${deckId}`),
+    ]).then(
+      ([collectionPage, deck]) => {
+        if (cancelled) return;
+        setResult({
+          key: requestKey,
+          status: 'ready',
+          collection: collectionPage?.content ?? [],
+          deck,
+        });
+      },
+      (error) => {
+        if (cancelled) return;
+        setResult({
+          key: requestKey,
+          status: error instanceof ApiError && error.status === 404 ? 'notFound' : 'error',
+        });
+      },
+    );
+
+    return () => {
+      cancelled = true;
+    };
+  }, [deckId, isNew, requestKey]);
+
+  const current = result?.key === requestKey ? result : { status: 'loading' };
+
+  if (current.status === 'notFound') {
     return (
       <section className="container app-page">
         <h1>Mazzo non trovato</h1>
@@ -83,58 +137,134 @@ export default function MazzoEditor() {
     );
   }
 
+  if (current.status === 'error') {
+    return (
+      <section className="container app-page">
+        <h1>Impossibile caricare il mazzo</h1>
+        <p role="alert">{LOAD_ERROR}</p>
+        <p>
+          <Link to="/mazzi">Torna ai tuoi mazzi</Link>
+        </p>
+      </section>
+    );
+  }
+
+  if (current.status !== 'ready') {
+    return (
+      <section className="container app-page">
+        <p className="deck-status" role="status">
+          Caricamento del mazzo…
+        </p>
+      </section>
+    );
+  }
+
   // key: passando da un mazzo all'altro lo stato dell'editor riparte da zero
-  return <DeckEditor key={deckId} deck={deck} />;
+  return (
+    <DeckEditor
+      key={deckId}
+      deckId={isNew ? null : deckId}
+      deck={current.deck}
+      collection={current.collection}
+    />
+  );
 }
 
-function DeckEditor({ deck }) {
+function DeckEditor({ deckId, deck, collection }) {
   const navigate = useNavigate();
 
-  // TODO: caricare la collezione dal backend (es. api.get('/collection')) quando l'endpoint esiste
-  const collection = mockCollection;
-  const cardsById = useMemo(() => new Map(collection.map((card) => [card.id, card])), [collection]);
-
-  const [name, setName] = useState(deck.name);
-  const [cards, setCards] = useState(deck.cards);
-  const [saved, setSaved] = useState(false);
+  const [name, setName] = useState(deck?.name ?? 'Nuovo mazzo');
+  const [cards, setCards] = useState(() =>
+    Object.fromEntries((deck?.cards ?? []).map((card) => [String(card.cardId), card.copies])),
+  );
 
   const [query, setQuery] = useState('');
-  const [type, setType] = useState(ALL);
   const [faction, setFaction] = useState(ALL);
   const [rarity, setRarity] = useState(ALL);
   const [sort, setSort] = useState(ALL);
-  const [ownership, setOwnership] = useState(OWNED);
   const [showInDeck, setShowInDeck] = useState(true);
+
+  const [check, setCheck] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(null);
+
+  const collectionCards = useMemo(() => collection.map(collectionCard), [collection]);
+  const cardsById = useMemo(() => {
+    const byId = new Map();
+    (deck?.cards ?? []).forEach((card) => byId.set(String(card.cardId), deckCard(card)));
+    collectionCards.forEach((card) => byId.set(String(card.cardId), card));
+    return byId;
+  }, [collectionCards, deck]);
 
   const entries = useMemo(() => deckEntries(cards, cardsById), [cards, cardsById]);
   const summary = useMemo(() => summarizeDeck(cards, cardsById), [cards, cardsById]);
-  const getBlockReason = (card) => addBlockReason(card, cards[card.id] ?? 0, summary);
+  const getBlockReason = (card) => addBlockReason(card, cards[String(card.cardId)] ?? 0, summary);
 
   const visibleCards = useMemo(() => {
     const text = query.trim().toLowerCase();
-    return collection
-      .filter((card) => {
-        const isEffect = card.rarity === 'effetto';
-        return (
+    return collectionCards
+      .filter(
+        (card) =>
           (!text || card.name.toLowerCase().includes(text)) &&
-          (!type || (type === 'effetto') === isEffect) &&
           (!faction || card.faction === faction) &&
           (!rarity || card.rarity === rarity) &&
-          (ownership !== OWNED || card.owned) &&
-          (ownership !== MISSING || !card.owned) &&
-          (showInDeck || !cards[card.id])
-        );
-      })
+          (showInDeck || !cards[String(card.cardId)]),
+      )
       .sort(SORTERS[sort].compare);
-  }, [collection, query, type, faction, rarity, sort, ownership, showInDeck, cards]);
+  }, [collectionCards, query, faction, rarity, sort, showInDeck, cards]);
+
+  // Payload ordinato: la chiave cambia solo quando cambia il contenuto del mazzo.
+  const payloadCards = useMemo(
+    () =>
+      entries
+        .map(({ card, count }) => ({ cardId: card.cardId, copies: count }))
+        .sort((a, b) => String(a.cardId).localeCompare(String(b.cardId))),
+    [entries],
+  );
+  const cardsKey = JSON.stringify(payloadCards);
+
+  useEffect(() => {
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      api.post('/me/decks/validate', { cards: payloadCards }).then(
+        (result) =>
+          !cancelled &&
+          setCheck({
+            key: cardsKey,
+            valid: result?.valid === true,
+            violations: result?.violations ?? [],
+          }),
+        () => !cancelled && setCheck({ key: cardsKey, error: true, violations: [] }),
+      );
+    }, VALIDATION_DELAY);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [cardsKey, payloadCards]);
+
+  const isChecked = check?.key === cardsKey;
+  const validation = isChecked
+    ? {
+        status: check.error ? 'error' : check.valid ? 'valid' : 'invalid',
+        violations: check.violations,
+      }
+    : { status: 'pending', violations: [] };
+  const serverViolations = validation.violations ?? [];
+  const issueCount =
+    validation.status === 'pending' || validation.status === 'error'
+      ? summary.problems.length
+      : serverViolations.length;
+  const canSave = validation.status === 'valid' && name.trim().length > 0 && !saving;
 
   function changeCount(card, delta) {
-    setSaved(false);
+    const key = String(card.cardId);
     setCards((current) => {
-      const count = (current[card.id] ?? 0) + delta;
+      const count = (current[key] ?? 0) + delta;
       const next = { ...current };
-      if (count > 0) next[card.id] = count;
-      else delete next[card.id];
+      if (count > 0) next[key] = count;
+      else delete next[key];
       return next;
     });
   }
@@ -144,14 +274,20 @@ function DeckEditor({ deck }) {
   };
   const removeCard = (card) => changeCount(card, -1);
 
-  function handleSave() {
-    if (!summary.valid) return;
-    // TODO: salvare sul backend (api.post('/decks') per un mazzo nuovo, api.put(`/decks/${deck.id}`) altrimenti)
-    setSaved(true);
+  async function handleSave() {
+    if (!canSave) return;
+    setSaving(true);
+    setSaveError(null);
+    const body = { name: name.trim(), cards: payloadCards };
+    try {
+      if (deckId) await api.put(`/me/decks/${deckId}`, body);
+      else await api.post('/me/decks', body);
+      navigate('/mazzi');
+    } catch (failure) {
+      setSaveError(saveErrorOf(failure));
+      setSaving(false);
+    }
   }
-
-  const toggleOwnership = (value) => setOwnership((current) => (current === value ? ALL : value));
-  const problemCount = summary.problems.length;
 
   return (
     <div className="deck-editor">
@@ -161,13 +297,7 @@ function DeckEditor({ deck }) {
             <Link className="deck-bar__back" to="/mazzi">
               <Icon name="chevron-left" size={16} />I miei mazzi
             </Link>
-            <DeckName
-              value={name}
-              onChange={(value) => {
-                setName(value);
-                setSaved(false);
-              }}
-            />
+            <DeckName value={name} onChange={setName} />
           </div>
 
           <div className="deck-bar__meters">
@@ -181,9 +311,9 @@ function DeckEditor({ deck }) {
           </div>
 
           <div className="deck-bar__actions">
-            {problemCount > 0 && (
+            {issueCount > 0 && (
               <Tag tone="alert">
-                {problemCount} {problemCount === 1 ? 'problema' : 'problemi'}
+                {issueCount} {issueCount === 1 ? 'problema' : 'problemi'}
               </Tag>
             )}
             <button
@@ -193,8 +323,8 @@ function DeckEditor({ deck }) {
             >
               Annulla
             </button>
-            <button type="button" className="button" onClick={handleSave} disabled={!summary.valid}>
-              Salva mazzo
+            <button type="button" className="button" onClick={handleSave} disabled={!canSave}>
+              {saving ? 'Salvataggio…' : 'Salva mazzo'}
             </button>
           </div>
         </div>
@@ -223,19 +353,6 @@ function DeckEditor({ deck }) {
                 onChange={(event) => setQuery(event.target.value)}
                 className="deck-filters__search"
               />
-              <div className="segmented" role="group" aria-label="Tipo di carta">
-                {TYPES.map(({ value, label }) => (
-                  <button
-                    key={value}
-                    type="button"
-                    className="segmented__option"
-                    aria-pressed={type === value}
-                    onClick={() => setType(value)}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
               <div className="deck-filters__selects">
                 <ChipSelect
                   label="Fazione"
@@ -257,27 +374,25 @@ function DeckEditor({ deck }) {
               <span id="deck-filters-show" className="deck-filters__label">
                 Mostra:
               </span>
-              <Chip selected={ownership === OWNED} onClick={() => toggleOwnership(OWNED)}>
-                Solo possedute
-              </Chip>
               <Chip selected={showInDeck} onClick={() => setShowInDeck((value) => !value)}>
                 Anche nel mazzo
-              </Chip>
-              <Chip selected={ownership === MISSING} onClick={() => toggleOwnership(MISSING)}>
-                Non possedute
               </Chip>
             </div>
           </div>
 
           {visibleCards.length === 0 ? (
-            <p className="deck-empty">Nessuna carta corrisponde ai filtri selezionati.</p>
+            <p className="deck-empty">
+              {collectionCards.length === 0
+                ? 'Non possiedi ancora carte.'
+                : 'Nessuna carta corrisponde ai filtri selezionati.'}
+            </p>
           ) : (
             <ul className="deck-grid" role="list">
               {visibleCards.map((card) => (
                 <DeckCardCell
-                  key={card.id}
+                  key={card.cardId}
                   card={card}
-                  inDeck={cards[card.id] ?? 0}
+                  inDeck={cards[String(card.cardId)] ?? 0}
                   blockReason={getBlockReason(card)}
                   onAdd={() => addCard(card)}
                   onRemove={() => removeCard(card)}
@@ -294,7 +409,11 @@ function DeckEditor({ deck }) {
           onAdd={addCard}
           onRemove={removeCard}
           onSave={handleSave}
-          saved={saved}
+          validation={validation}
+          canSave={canSave}
+          nameMissing={!name.trim()}
+          saving={saving}
+          saveError={saveError}
         />
       </div>
     </div>

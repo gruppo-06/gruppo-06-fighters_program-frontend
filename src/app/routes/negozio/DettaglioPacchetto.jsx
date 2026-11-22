@@ -2,10 +2,10 @@
 import { useEffect, useId, useRef } from 'react';
 import Icon from '../../../components/Icon.jsx';
 import Price from '../../../components/Price.jsx';
-import Tag from '../../../components/Tag.jsx';
+import { RARITY_LABELS } from '../../../components/rarity.js';
 import './DettaglioPacchetto.css';
 
-/** Titoletto + elenco "voce valore" (composizione, probabilità). */
+/** Titoletto + elenco "voce valore" (composizione). */
 function Legend({ title, items }) {
   return (
     <div className="pack-dialog__legend">
@@ -22,16 +22,26 @@ function Legend({ title, items }) {
   );
 }
 
-export default function DettaglioPacchetto({ pack, credits, availability, onClose, onPurchase }) {
+/**
+ * @param {object} pack  { id, name, description, price, totalCards, contents:[{rarity, cardCount}], image? }
+ * @param {number|null} credits  saldo del giocatore; null finché non è caricato
+ * @param {boolean} purchasing  acquisto in corso: il bottone è disabilitato
+ * @param {string|null} error  errore dell'ultimo tentativo di acquisto
+ */
+export default function DettaglioPacchetto({
+  pack,
+  credits,
+  purchasing,
+  error,
+  onClose,
+  onPurchase,
+}) {
   const dialogRef = useRef(null);
   const titleRef = useRef(null);
   const titleId = useId();
-  // Un ref e non uno state: deve bloccare anche un secondo click prima del nuovo render
-  const purchasedRef = useRef(false);
-  const { name, tier, image, price, details } = pack;
-  const { season, summary, contents, odds, notes } = details;
+  const { name, description, image, price, totalCards, contents = [] } = pack;
   const balanceAfter = credits - price;
-  const affordable = balanceAfter >= 0;
+  const affordable = credits != null && balanceAfter >= 0;
 
   useEffect(() => {
     // showModal gestisce focus, Esc e blocco della pagina sottostante
@@ -42,11 +52,10 @@ export default function DettaglioPacchetto({ pack, credits, availability, onClos
   // Si passa sempre da close(): riporta il focus sul bottone che ha aperto la modale
   const close = () => dialogRef.current.close();
 
-  function purchase() {
-    if (purchasedRef.current) return;
-    purchasedRef.current = true;
-    onPurchase(pack);
-  }
+  const composition = contents.map(({ rarity, cardCount }) => ({
+    label: RARITY_LABELS[rarity?.toLowerCase()] ?? rarity,
+    value: cardCount,
+  }));
 
   return (
     <dialog
@@ -71,47 +80,34 @@ export default function DettaglioPacchetto({ pack, credits, availability, onClos
                 <span>Artwork {name}</span>
               </div>
             )}
-            <div className="pack-dialog__labels">
-              <Tag tone={tier.tone}>{tier.label}</Tag>
-              {season && <Tag tone="elemento">{season}</Tag>}
-            </div>
-            {availability && <p className="pack-dialog__availability">{availability}</p>}
           </div>
 
           <div className="pack-dialog__content">
             <div className="pack-dialog__info">
               <header className="pack-dialog__heading">
-                <p className="eyebrow">{season ? `Pacchetto · ${season}` : 'Pacchetto'}</p>
+                <p className="eyebrow">Pacchetto</p>
                 <h2 ref={titleRef} id={titleId} className="pack-dialog__title" tabIndex={-1}>
                   {name}
                 </h2>
               </header>
-              <p className="pack-dialog__description">{details.description ?? pack.description}</p>
-              <ul className="pack-dialog__summary" role="list">
-                {summary.map(({ value, label }) => (
-                  <li key={label}>
-                    <span className="pack-dialog__stat-value">{value}</span>{' '}
-                    <span className="pack-dialog__stat-label">{label}</span>
+              <p className="pack-dialog__description">{description}</p>
+              {totalCards != null && (
+                <ul className="pack-dialog__summary" role="list">
+                  <li>
+                    <span className="pack-dialog__stat-value">{totalCards}</span>{' '}
+                    <span className="pack-dialog__stat-label">carte</span>
                   </li>
-                ))}
-              </ul>
+                </ul>
+              )}
               <hr className="pack-dialog__divider" />
-              <Legend title="Cosa contiene" items={contents} />
-              {odds && <Legend title="Slot bonus · probabilità" items={odds} />}
+              {composition.length > 0 && <Legend title="Cosa contiene" items={composition} />}
             </div>
 
             <div className="pack-dialog__bottom">
-              {notes && (
-                <ul className="pack-dialog__notes">
-                  {notes.map((note) => (
-                    <li key={note}>{note}</li>
-                  ))}
-                </ul>
-              )}
               <div className="pack-dialog__purchase">
                 <div className="pack-dialog__price">
                   <Price amount={price} size="xl" />
-                  {affordable ? (
+                  {credits == null ? null : affordable ? (
                     <div className="pack-dialog__balance">
                       <span>Saldo dopo l&apos;acquisto</span>
                       <Price amount={balanceAfter} size="sm" />
@@ -123,13 +119,18 @@ export default function DettaglioPacchetto({ pack, credits, availability, onClos
                 <button
                   type="button"
                   className="button button--lg pack-dialog__buy"
-                  disabled={!affordable}
-                  onClick={purchase}
+                  disabled={!affordable || purchasing}
+                  onClick={() => onPurchase(pack)}
                 >
                   <Icon name="play" size={16} />
-                  Acquista e apri
+                  {purchasing ? 'Apertura…' : 'Acquista e apri'}
                 </button>
               </div>
+              {error && (
+                <p className="pack-dialog__error" role="alert">
+                  {error}
+                </p>
+              )}
             </div>
           </div>
         </div>

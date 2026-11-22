@@ -168,7 +168,7 @@
   gap: 2.4cqi;
 }
 
-/* ---------- Riepilogo e trofeo ---------- */
+/* ---------- Riepilogo e azioni ---------- */
 .pack-opening .pack-opening__summary {
   display: flex;
   flex-wrap: wrap;
@@ -181,60 +181,6 @@
   display: flex;
 }
 
-.pack-opening__trophy {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  width: min(360px, 100% - 2 * var(--space-4));
-  padding: var(--space-3);
-  border: 1px solid var(--color-border-default);
-  background: var(--color-background-surface);
-}
-
-.pack-opening__trophy-badge {
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-  width: 2.75rem;
-  height: 2.75rem;
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--color-accent-highlight) 12%, transparent);
-  box-shadow: inset 0 0 0 1.5px var(--color-accent-highlight);
-  color: var(--color-accent-highlight);
-}
-
-/* In Figma il tratto è 1.5px a 18px: 2 nel viewBox da 24 */
-.pack-opening__trophy-badge path {
-  stroke-width: 2;
-}
-
-.pack-opening__trophy-text {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  min-width: 0;
-  line-height: var(--line-height-tight);
-}
-
-.pack-opening__trophy-title {
-  font-weight: var(--font-weight-semibold);
-}
-
-.pack-opening__trophy-reward {
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
-  line-height: 1.45;
-}
-
-.pack-opening__trophy-status {
-  color: var(--color-accent-highlight);
-  font-size: 0.6875rem; /* 11px Label/Stat */
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-/* ---------- Azioni ---------- */
 .pack-opening__actions {
   display: flex;
   flex-wrap: wrap;
@@ -246,31 +192,6 @@
 
 .pack-opening__actions .button {
   padding: 14px var(--space-6);
-}
-
-.pack-opening__actions .pack-opening__again {
-  border: 0;
-}
-
-/* Simbolo ◎ del mockup disegnato in CSS: Rajdhani non lo ha e il font di riserva cambia per sistema */
-.pack-opening__coin {
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  border: 3px double currentColor;
-  border-radius: 50%;
-  margin-inline: 1px;
-  vertical-align: -1px;
-}
-
-.pack-opening__again:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.pack-opening__error {
-  color: var(--color-accent-highlight);
-  font-size: var(--font-size-sm);
 }
 
 @media (min-width: 64rem) {

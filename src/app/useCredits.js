@@ -1,21 +1,28 @@
 import { useEffect, useState } from 'react';
-import { getBalance } from '../data/mockShop.js';
 import { api } from '../services/api.js';
+import { onCreditsChanged } from '../services/auth.js';
 
-/** Crediti del giocatore: GET /me, con saldo finto finché il backend non risponde. */
+/** Saldo crediti del giocatore (GET /me/credits), riletto a ogni cambio di saldo. null finché non arriva. */
 export function useCredits() {
-  const [serverCredits, setServerCredits] = useState(null);
+  const [balance, setBalance] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
-    api
-      .get('/me')
-      .then((user) => !cancelled && setServerCredits(user?.credits ?? null))
-      .catch(() => {});
+
+    function refresh() {
+      api
+        .get('/me/credits')
+        .then((credits) => !cancelled && setBalance(credits.balance))
+        .catch(() => {});
+    }
+
+    refresh();
+    const unsubscribe = onCreditsChanged(refresh);
     return () => {
       cancelled = true;
+      unsubscribe();
     };
   }, []);
 
-  return getBalance(serverCredits);
+  return balance;
 }

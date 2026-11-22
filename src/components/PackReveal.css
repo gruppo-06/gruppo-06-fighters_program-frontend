@@ -1,0 +1,211 @@
+/* Modale di apertura pacchetto. Mobile-first. */
+
+.pack-reveal {
+  width: min(100% - 2 * var(--space-4), 70rem); /* 1120px */
+  max-width: none;
+  max-height: none;
+  margin: auto;
+  padding: 0;
+  overflow: visible;
+  background: transparent;
+  border: 0;
+  color: var(--color-text-primary);
+  /* drop-shadow segue il contorno con l'angolo tagliato del pannello */
+  filter: drop-shadow(0 24px 32px rgb(0 0 0 / 60%));
+}
+
+.pack-reveal::backdrop {
+  background: rgb(10 11 14 / 80%);
+}
+
+.pack-reveal p {
+  margin: 0;
+}
+
+.pack-reveal__panel {
+  --cut: var(--cut-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  max-height: calc(100dvh - 2 * var(--space-4));
+  padding: var(--space-5);
+  overflow: auto;
+  background: var(--color-background-surface);
+  border: 1px solid var(--color-border-strong);
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - var(--cut)),
+    calc(100% - var(--cut)) 100%,
+    0 100%
+  );
+}
+
+/* ---------- Intestazione ---------- */
+.pack-reveal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.pack-reveal__heading {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.pack-reveal__title {
+  font-size: var(--font-size-4xl);
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+
+.pack-reveal__subtitle {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.45;
+}
+
+.pack-reveal__close {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  transition: background-color var(--transition);
+}
+
+.pack-reveal__close:hover {
+  background: var(--color-background-placeholder);
+}
+
+/* ---------- Carte ---------- */
+.pack-reveal__loading {
+  padding-block: var(--space-10);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.pack-reveal__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pack-reveal__cell {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  min-width: 0;
+}
+
+.pack-reveal__card {
+  width: 100%;
+  animation: pack-reveal-flip 0.45s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+
+.pack-reveal__back {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.pack-reveal__back .card-back {
+  width: 100%;
+  transition:
+    transform var(--transition),
+    border-color var(--transition);
+}
+
+.pack-reveal__back:hover .card-back {
+  transform: translateY(-4px) scale(1.02);
+  border-color: var(--color-accent-highlight);
+}
+
+/* Bagliore per le carte più rare */
+.pack-reveal__cell--epica {
+  --reveal-glow: var(--color-rarity-epica);
+}
+
+.pack-reveal__cell--leggendaria {
+  --reveal-glow: var(--color-rarity-leggendaria);
+}
+
+.pack-reveal__cell--epica .fighter-card {
+  box-shadow: 0 0 30px color-mix(in srgb, var(--reveal-glow) 55%, transparent);
+}
+
+.pack-reveal__cell--leggendaria .fighter-card {
+  box-shadow: 0 0 38px color-mix(in srgb, var(--reveal-glow) 65%, transparent);
+}
+
+.pack-reveal__cell--epica .pack-reveal__card,
+.pack-reveal__cell--leggendaria .pack-reveal__card {
+  animation:
+    pack-reveal-flip 0.45s cubic-bezier(0.2, 0.7, 0.3, 1) both,
+    pack-reveal-glow 1.8s ease-in-out 0.45s infinite alternate;
+}
+
+/* ---------- Azioni ---------- */
+.pack-reveal__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
+
+.pack-reveal .button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pack-reveal .button:disabled:hover {
+  background: var(--color-accent-primary);
+}
+
+.pack-reveal .button--secondary:disabled:hover {
+  background: transparent;
+}
+
+@keyframes pack-reveal-flip {
+  from {
+    opacity: 0;
+    transform: perspective(900px) rotateY(-85deg) scale(0.84);
+  }
+
+  to {
+    opacity: 1;
+    transform: perspective(900px) rotateY(0) scale(1);
+  }
+}
+
+@keyframes pack-reveal-glow {
+  from {
+    filter: drop-shadow(0 0 0 transparent);
+  }
+
+  to {
+    filter: drop-shadow(0 0 14px var(--reveal-glow));
+  }
+}
+
+@media (min-width: 64rem) {
+  .pack-reveal__panel {
+    padding: var(--space-7) var(--space-10) var(--space-8);
+  }
+
+  .pack-reveal__title {
+    font-size: var(--font-size-6xl);
+  }
+}

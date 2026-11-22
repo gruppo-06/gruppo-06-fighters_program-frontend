@@ -18,6 +18,34 @@
   padding-top: 0.12em;
 }
 
+.price--sm {
+  gap: 6px;
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-tight);
+}
+
+.price--xl {
+  gap: 10px;
+  font-size: var(--font-size-6xl);
+  line-height: 0.9;
+}
+
+/* Queste due taglie hanno l'altezza esatta del testo: niente compensazione */
+.price--sm .price__value,
+.price--xl .price__value {
+  padding-top: 0;
+}
+
+/* Il tratto dell'icona resta 1.5px anche scalandola (viewBox da 16) */
+.price--sm .price__icon path {
+  stroke-width: 1.71;
+}
+
+.price--xl .price__icon path {
+  stroke-width: 0.8;
+}
+
 .price--md {
   gap: 6px;
   font-size: var(--font-size-3xl);

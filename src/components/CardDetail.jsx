@@ -11,20 +11,16 @@ const STATS = [
   { key: 'crt', label: 'Critico' },
 ];
 
-/** Slot sottocarte di un fighter: uno Danno/Difesa e uno Effetto. */
-const SUBCARD_SLOTS = ['Danno/Difesa', 'Effetto'];
-
 /**
  * Modale con il dettaglio di una carta (Figma: DETTAGLIO CARTA).
  * Usa <dialog> nativo: focus intrappolato, chiusura con Esc e clic sullo sfondo.
  *
- * @param {object|null} card   carta da mostrare; null = modale chiusa
- * @param {number} total       numero di carte del catalogo (per "#026 / 095")
+ * @param {object|null} card   carta da mostrare (forma di toFighter); null = modale chiusa
  * @param {() => void} onClose
  * @param {(card) => void} [onAddToDeck]
  * @param {(card) => void} [onProposeTrade]
  */
-export default function CardDetail({ card, total, onClose, onAddToDeck, onProposeTrade }) {
+export default function CardDetail({ card, onClose, onAddToDeck, onProposeTrade }) {
   const dialogRef = useRef(null);
 
   useEffect(() => {
@@ -49,7 +45,6 @@ export default function CardDetail({ card, total, onClose, onAddToDeck, onPropos
       {card && (
         <CardDetailContent
           card={card}
-          total={total}
           onClose={onClose}
           onAddToDeck={onAddToDeck}
           onProposeTrade={onProposeTrade}
@@ -59,14 +54,9 @@ export default function CardDetail({ card, total, onClose, onAddToDeck, onPropos
   );
 }
 
-function CardDetailContent({ card, total, onClose, onAddToDeck, onProposeTrade }) {
-  const isEffect = card.rarity === 'effetto';
+function CardDetailContent({ card, onClose, onAddToDeck, onProposeTrade }) {
   const rarityLabel = RARITY_LABELS[card.rarity] ?? card.rarity;
-  const totalLabel = String(total).padStart(3, '0');
-  const eyebrow = isEffect
-    ? `${rarityLabel} · #${card.number} / ${totalLabel}`
-    : `${card.region} · ${rarityLabel} · #${card.number} / ${totalLabel}`;
-  const equipped = card.equipped ?? [];
+  const eyebrow = `${card.region} · ${rarityLabel} · ${card.number}`;
 
   return (
     <div className="card-detail__panel">
@@ -97,55 +87,26 @@ function CardDetailContent({ card, total, onClose, onAddToDeck, onProposeTrade }
         <h2 id="card-detail-title" className="card-detail__title">
           {card.name}
         </h2>
-        <p className="card-detail__lore">{isEffect ? card.description : card.lore}</p>
+        {card.lore && <p className="card-detail__lore">{card.lore}</p>}
 
-        {!isEffect && (
-          <>
-            <dl className="card-detail__stats">
-              {STATS.map(({ key, label }) => (
-                <div key={key} className="card-detail__stat">
-                  <dt>{label}</dt>
-                  <dd>{card.stats[key]}</dd>
-                </div>
-              ))}
-            </dl>
-
-            <div className="card-detail__tags">
-              <Tag tone={card.rarity}>{rarityLabel}</Tag>
-              <Tag tone="outline">Classe · {card.role}</Tag>
-              <Tag tone="elemento">Elemento · {card.element}</Tag>
+        <dl className="card-detail__stats">
+          {STATS.map(({ key, label }) => (
+            <div key={key} className="card-detail__stat">
+              <dt>{label}</dt>
+              <dd>{card.stats[key]}</dd>
             </div>
+          ))}
+        </dl>
 
-            <div className="card-detail__subcards">
-              <p className="card-detail__subcards-title">
-                {`Sottocarte equipaggiabili · ${SUBCARD_SLOTS.length} slot (${SUBCARD_SLOTS.join(' + ')})`}
-              </p>
-              <ul className="card-detail__slots" role="list">
-                {SUBCARD_SLOTS.map((slot, i) =>
-                  equipped[i] ? (
-                    <li key={slot} className="card-detail__slot is-filled">
-                      {equipped[i]}
-                    </li>
-                  ) : (
-                    <li key={slot} className="card-detail__slot">
-                      + Slot {slot}
-                    </li>
-                  ),
-                )}
-              </ul>
-            </div>
-          </>
-        )}
-
-        {isEffect && (
-          <div className="card-detail__tags">
-            <Tag tone="outline">Carta Effetto</Tag>
-          </div>
-        )}
+        <div className="card-detail__tags">
+          <Tag tone={card.rarity}>{rarityLabel}</Tag>
+          <Tag tone="outline">Classe · {card.role}</Tag>
+          <Tag tone="outline">Fazione · {card.faction}</Tag>
+        </div>
 
         <p className="card-detail__owned">
           {card.owned
-            ? `Possiedi ${card.copies} ${card.copies === 1 ? 'copia' : 'copie'} · usata in ${card.decks} ${card.decks === 1 ? 'mazzo' : 'mazzi'}`
+            ? `Possiedi ${card.copies} ${card.copies === 1 ? 'copia' : 'copie'}`
             : 'Non possiedi ancora questa carta'}
         </p>
 

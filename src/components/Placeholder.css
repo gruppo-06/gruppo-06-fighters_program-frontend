@@ -1,0 +1,132 @@
+/*
+ * Pannello segnaposto (vedi Placeholder.jsx) e stili condivisi delle pagine
+ * segnaposto (.placeholder-page, .placeholder-list). Mobile-first.
+ */
+
+.placeholder-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding-block: var(--space-8) var(--space-16);
+}
+
+.placeholder-page p {
+  margin: 0;
+}
+
+.placeholder-page__title {
+  font-family: var(--font-display);
+  font-size: var(--font-size-5xl);
+  line-height: var(--line-height-display);
+  text-transform: uppercase;
+}
+
+/* Bordo tratteggiato, angolo tagliato e sfondo a righe diagonali, tutto dai token */
+.placeholder {
+  --cut: var(--cut-lg);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  border: 2px dashed var(--color-border-strong);
+  background-color: var(--color-background-placeholder);
+  background-image: repeating-linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-border-default) 70%, transparent) 0 2px,
+    transparent 2px 16px
+  );
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - var(--cut)),
+    calc(100% - var(--cut)) 100%,
+    0 100%
+  );
+}
+
+.placeholder__badge {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-accent-link);
+  border-radius: var(--radius-sm);
+  background: var(--color-background-surface-sunken);
+  color: var(--color-accent-link);
+  font-family: var(--font-display);
+  font-size: var(--font-size-xs);
+  letter-spacing: var(--letter-spacing-eyebrow);
+  text-transform: uppercase;
+}
+
+.placeholder__header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.placeholder__title {
+  font-family: var(--font-display);
+  font-size: var(--font-size-4xl);
+  line-height: var(--line-height-display);
+  text-transform: uppercase;
+}
+
+.placeholder__description {
+  max-width: 60ch;
+  color: var(--color-text-muted);
+  line-height: var(--line-height-body);
+}
+
+/* Il contenuto reale (es. elenco mazzi) sta su una superficie piena, leggibile sulle righe */
+.placeholder__content {
+  align-self: stretch;
+  padding: var(--space-4);
+  border: 1px solid var(--color-border-default);
+  background: var(--color-background-surface);
+}
+
+@media (min-width: 48rem) {
+  .placeholder__title {
+    font-size: var(--font-size-5xl);
+  }
+}
+
+/* ---------- Elenco read-only (es. mazzi del giocatore) ---------- */
+.placeholder-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.placeholder-list__item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border-default);
+  background: var(--color-background-surface-sunken);
+}
+
+.placeholder-list__name {
+  font-weight: var(--font-weight-semibold);
+}
+
+.placeholder-list__meta {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.placeholder-status {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.placeholder-alert {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-accent-primary);
+  background: var(--color-accent-primary-dark);
+  color: var(--color-text-primary);
+}

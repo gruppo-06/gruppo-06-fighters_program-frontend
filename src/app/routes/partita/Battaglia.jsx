@@ -1,5 +1,5 @@
 /** Fase 2: replay della partita simulata dal server (Figma: GIOCA – Area di gioco). */
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Avatar from '../../../components/Avatar.jsx';
 import CardBack from '../../../components/CardBack.jsx';
@@ -11,11 +11,6 @@ import { EXIT_PATH } from './paths.js';
 /** Durata di un round a velocità 1x (ms). */
 const ROUND_MS = 2400;
 const SPEEDS = [1, 2];
-
-const OUTCOMES = {
-  schivata: { label: 'Schivata', tone: 'rara' },
-  critico: { label: 'Critico', tone: 'epica' },
-};
 
 /**
  * @param {boolean} finished  partita conclusa: mostra l'ultimo round, fermo,
@@ -29,6 +24,7 @@ export default function Battaglia({ match, onEnd, finished = false }) {
   const [index, setIndex] = useState(finished ? lastIndex : 0);
   const [speed, setSpeed] = useState(1);
   const [paused, setPaused] = useState(false);
+  const logRef = useRef(null);
 
   // Avanza di un round alla volta; dopo l'ultimo passa al risultato
   useEffect(() => {
@@ -39,6 +35,12 @@ export default function Battaglia({ match, onEnd, finished = false }) {
     }, ROUND_MS / speed);
     return () => clearTimeout(id);
   }, [index, lastIndex, paused, speed, finished, onEnd]);
+
+  // Tiene visibile l'ultimo round della cronaca
+  useEffect(() => {
+    const log = logRef.current;
+    if (log) log.scrollTop = log.scrollHeight;
+  }, [index, finished]);
 
   const shownIndex = finished ? lastIndex : index;
   const event = events[shownIndex];
@@ -55,7 +57,7 @@ export default function Battaglia({ match, onEnd, finished = false }) {
         </Link>
 
         <div className="battle-bar__title">
-          <p className="battle-bar__eyebrow">{match.mode} · Simulata dal server</p>
+          <p className="battle-bar__eyebrow">{match.mode} · Replay</p>
           <h1>
             Turno {event.turn} · Round {event.round}
           </h1>
@@ -111,9 +113,6 @@ export default function Battaglia({ match, onEnd, finished = false }) {
           <p className="arena__vs-label" aria-hidden="true">
             VS
           </p>
-          <p>
-            VEL {event.me.fighter.stats.vel} vs {event.opponent.fighter.stats.vel}
-          </p>
           <p>Round {event.round}</p>
         </div>
 
@@ -123,24 +122,37 @@ export default function Battaglia({ match, onEnd, finished = false }) {
           <CardBack />
           <p>Mazzo · {state.deck.opponent}</p>
         </div>
+      </section>
 
-        <p className="arena__log" aria-live="polite">
-          <span className="arena__log-label">Ultimo evento</span>
-          <span>{event.log}</span>
-        </p>
+      <section className="battle-log" aria-label="Cronaca della partita">
+        <h2 className="battle-log__title">Cronaca</h2>
+        <ol className="battle-log__list" ref={logRef} role="list" aria-live="polite">
+          {events.slice(0, shownIndex + 1).map((round, i) => (
+            <li
+              key={`${round.turn}-${round.round}-${i}`}
+              className="battle-log__item"
+              aria-current={i === shownIndex ? 'true' : undefined}
+            >
+              <p className="battle-log__round">
+                Turno {round.turn} · Round {round.round}
+              </p>
+              <p className="battle-log__narration">{round.log}</p>
+            </li>
+          ))}
+        </ol>
       </section>
 
       <footer className="battle-progress">
         <div className="battle-progress__labels">
           <span>Avanzamento partita</span>
           <span>
-            Turno {event.turn} di max {maxTurns}
+            Turno {event.turn} di {maxTurns}
           </span>
         </div>
         <ProgressBar
           value={event.turn}
           max={maxTurns}
-          label={`Turno ${event.turn} di massimo ${maxTurns}`}
+          label={`Turno ${event.turn} di ${maxTurns}`}
         />
       </footer>
     </div>
@@ -151,12 +163,9 @@ function PlayerStatus({ player, side, state, startingHp }) {
   const hp = state.hp[side];
   return (
     <section className={`player-status player-status--${side}`} aria-label={`@${player.username}`}>
-      <Avatar src={player.avatar} size={48} className="player-status__avatar" />
+      <Avatar size={48} className="player-status__avatar" />
       <div className="player-status__info">
-        <p className="player-status__name">
-          <span>@{player.username}</span>
-          <span className="match-level">Liv. {player.level}</span>
-        </p>
+        <p className="player-status__name">@{player.username}</p>
         <ProgressBar value={hp} max={startingHp} label={`Punti vita di @${player.username}`} />
         <p className="player-status__meta">
           PV {hp} / {startingHp} · Mazzo {state.deck[side]} · Sconfitti {state.defeated[side]}
@@ -168,17 +177,15 @@ function PlayerStatus({ player, side, state, startingHp }) {
 
 /** Carta in campo con i danni subiti nel round. */
 function Combatant({ side, hit }) {
-  const outcome = OUTCOMES[hit.outcome];
   return (
     <div className={`combatant combatant--${side} ${hit.ko ? 'is-ko' : ''}`.trim()}>
       <div className="combatant__hit">
         <p className={`combatant__damage ${hit.damage > 0 ? 'is-damage' : ''}`.trim()}>
           {hit.damage > 0 ? `−${hit.damage}` : '0'}
         </p>
-        {outcome && <Tag tone={outcome.tone}>{outcome.label}</Tag>}
-        {!outcome && hit.ko && <Tag>Sconfitto</Tag>}
-        {/* Segnaposto invisibile: tiene allineate le due carte anche senza etichetta */}
-        {!outcome && !hit.ko && (
+        {hit.ko ? (
+          <Tag>Sconfitto</Tag>
+        ) : (
           <span className="combatant__no-tag" aria-hidden="true">
             <Tag>&nbsp;</Tag>
           </span>

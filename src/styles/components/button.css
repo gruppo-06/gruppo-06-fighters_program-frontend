@@ -69,6 +69,21 @@
   background: var(--color-background-surface-sunken);
 }
 
+/* Disabilitato (es. "Salva mazzo" finché il mazzo non è valido) */
+.button:disabled,
+.button:disabled:hover {
+  background: var(--color-accent-primary-dark);
+  box-shadow: none;
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+.button--secondary:disabled,
+.button--secondary:disabled:hover {
+  background: transparent;
+  border-color: var(--color-border-strong);
+}
+
 .button--lg {
   gap: var(--space-3);
   padding: var(--space-3) var(--space-6);

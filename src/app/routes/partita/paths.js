@@ -1,2 +1,2 @@
-/** Dove portano "Esci" e "Torna alla dashboard". TODO: '/dashboard' quando la rotta esiste */
-export const EXIT_PATH = '/negozio';
+/** Dove portano "Esci" dalla battaglia e "Torna alle sfide" dal risultato. */
+export const EXIT_PATH = '/sfide';

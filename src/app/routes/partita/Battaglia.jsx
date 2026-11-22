@@ -107,7 +107,7 @@ export default function Battaglia({ match, onEnd, finished = false }) {
           <p>Mazzo · {state.deck.me}</p>
         </div>
 
-        <Combatant key={`me-${roundKey}`} side="me" hit={event.me} />
+        <Combatant key={`me-${roundKey}`} side="me" hit={event.me} advanced={match.advanced} />
 
         <div className="arena__vs">
           <p className="arena__vs-label" aria-hidden="true">
@@ -116,7 +116,12 @@ export default function Battaglia({ match, onEnd, finished = false }) {
           <p>Round {event.round}</p>
         </div>
 
-        <Combatant key={`opp-${roundKey}`} side="opponent" hit={event.opponent} />
+        <Combatant
+          key={`opp-${roundKey}`}
+          side="opponent"
+          hit={event.opponent}
+          advanced={match.advanced}
+        />
 
         <div className="arena__deck arena__deck--opponent">
           <CardBack />
@@ -176,7 +181,7 @@ function PlayerStatus({ player, side, state, startingHp }) {
 }
 
 /** Carta in campo con i danni subiti nel round. */
-function Combatant({ side, hit }) {
+function Combatant({ side, hit, advanced }) {
   return (
     <div className={`combatant combatant--${side} ${hit.ko ? 'is-ko' : ''}`.trim()}>
       <div className="combatant__hit">
@@ -191,7 +196,26 @@ function Combatant({ side, hit }) {
           </span>
         )}
       </div>
-      <FighterCard fighter={hit.fighter} className="combatant__card" />
+      <div className="combatant__frame">
+        <FighterCard fighter={hit.fighter} className="combatant__card" />
+        {advanced && <CombatFlags hit={hit} />}
+      </div>
+    </div>
+  );
+}
+
+/** Etichette della modalità avanzata, sopra la carta: primo colpo, schivata, critico. */
+function CombatFlags({ hit }) {
+  if (!hit.first && !hit.dodged && !hit.critical) return null;
+  return (
+    <div className="combatant__flags">
+      {hit.first && (
+        <Tag tone="outline" className="combatant__flag combatant__flag--first">
+          Primo colpo
+        </Tag>
+      )}
+      {hit.dodged && <Tag className="combatant__flag combatant__flag--dodge">Schivata!</Tag>}
+      {hit.critical && <Tag className="combatant__flag combatant__flag--critical">Critico!</Tag>}
     </div>
   );
 }

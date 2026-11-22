@@ -17,10 +17,26 @@ const RESULT_LABELS = {
   draw: { title: 'Pareggio', icon: 'minus' },
 };
 
+/** Schivate e colpi critici di ciascun lato, contati su tutti i round. */
+function countAdvancedActions(events) {
+  const actions = {
+    me: { dodges: 0, criticals: 0 },
+    opponent: { dodges: 0, criticals: 0 },
+  };
+  for (const event of events) {
+    for (const side of ['me', 'opponent']) {
+      if (event[side].dodged) actions[side].dodges += 1;
+      if (event[side].critical) actions[side].criticals += 1;
+    }
+  }
+  return actions;
+}
+
 export default function Risultato({ match, onReplay }) {
   const { result, players, events } = match;
   const last = events.at(-1);
   const opponent = `@${players.opponent.username}`;
+  const actions = countAdvancedActions(events);
   const finalHp = `PV finali ${last.state.hp.me} – ${last.state.hp.opponent}`;
   const outcome = result.winner === 'me' ? 'won' : result.winner === 'opponent' ? 'lost' : 'draw';
   const { title, icon } = RESULT_LABELS[outcome];
@@ -60,6 +76,34 @@ export default function Risultato({ match, onReplay }) {
         <p className="result__summary">
           {summary} · {finalHp}
         </p>
+
+        {match.advanced && (
+          <section className="result__cards" aria-labelledby="result-advanced-title">
+            <h2 id="result-advanced-title" className="result__cards-title">
+              Modalità avanzata
+            </h2>
+            <ul className="result__advanced-list" role="list">
+              {[
+                { name: 'Tu', ...actions.me },
+                { name: opponent, ...actions.opponent },
+              ].map(({ name, dodges, criticals }) => (
+                <li key={name} className="result__advanced-player">
+                  <p className="result__deck-title">{name}</p>
+                  <dl className="result__card-stats">
+                    <div>
+                      <dt>Schivate</dt>
+                      <dd>{dodges}</dd>
+                    </div>
+                    <div>
+                      <dt>Colpi critici</dt>
+                      <dd>{criticals}</dd>
+                    </div>
+                  </dl>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         <section className="result__cards" aria-labelledby="result-cards-title">
           <h2 id="result-cards-title" className="result__cards-title">

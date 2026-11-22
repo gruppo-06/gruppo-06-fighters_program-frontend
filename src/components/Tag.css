@@ -29,3 +29,17 @@
 .tag--leggendaria {
   --tag-color: var(--color-rarity-leggendaria);
 }
+
+/* Solo bordo, senza tinta (Figma: Tag tone=neutral; es. numero di copie, classe) */
+.tag--outline {
+  --tag-color: var(--color-border-strong);
+  background: transparent;
+  color: var(--color-text-secondary);
+}
+
+/* Elemento della carta (Figma: Tag tone=elemento) */
+.tag--elemento {
+  --tag-color: var(--color-border-strong);
+  background: var(--color-background-surface-sunken);
+  color: var(--color-text-primary);
+}

@@ -1,0 +1,41 @@
+/* Figma: MeterStat (+ ProgressBar). */
+.meter-stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.meter-stat p {
+  margin: 0;
+}
+
+.meter-stat__label {
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.45;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meter-stat__value {
+  font-family: var(--font-display);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: 0.95;
+  white-space: nowrap;
+}
+
+.meter-stat__bar {
+  height: 6px;
+  overflow: hidden;
+  background: var(--color-border-default);
+  border-radius: 3px;
+}
+
+.meter-stat__bar span {
+  display: block;
+  height: 100%;
+  background: var(--color-accent-highlight);
+}

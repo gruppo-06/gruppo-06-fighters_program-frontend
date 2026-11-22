@@ -1,0 +1,60 @@
+/* Chip di filtro (Figma: Chip). */
+.chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border: 1px solid var(--color-border-strong);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  white-space: nowrap;
+  transition:
+    background-color var(--transition),
+    border-color var(--transition),
+    color var(--transition);
+}
+
+.chip:hover {
+  border-color: var(--color-text-secondary);
+  color: var(--color-text-primary);
+}
+
+.chip.is-selected {
+  background: var(--color-text-primary);
+  border-color: var(--color-text-primary);
+  color: var(--color-background-page);
+}
+
+/* ---------- Variante con menu a tendina ---------- */
+.chip--select select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Le opzioni del menu usano i colori del sistema operativo: le forziamo scure */
+.chip--select option {
+  background: var(--color-background-surface);
+  color: var(--color-text-primary);
+}
+
+.chip--select:has(select:hover) {
+  border-color: var(--color-text-secondary);
+  color: var(--color-text-primary);
+}
+
+.chip--select.is-selected:has(select:hover) {
+  color: var(--color-background-page);
+}
+
+.chip--select:has(select:focus-visible) {
+  outline: 2px solid var(--color-accent-highlight);
+  outline-offset: 2px;
+}

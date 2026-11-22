@@ -1,0 +1,226 @@
+/* Pagina Trofei (Figma: TROFEI). Mobile-first. */
+
+.trophies {
+  /* Nel mockup il contenuto è largo 1200px (più il padding laterale del container) */
+  --container-max: calc(75rem + 2 * var(--space-4));
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  padding-block: var(--space-8) var(--space-16);
+}
+
+/* Spaziature gestite con gap: annulliamo quelle generiche di base.css */
+.trophies p {
+  margin: 0;
+}
+
+.trophies section + section {
+  margin-top: 0;
+}
+
+/* Angolo tagliato in basso a destra (16px nel mockup) */
+.trophies-profile,
+.trophies-rewards {
+  --cut: 16px;
+  background: var(--color-background-surface);
+  border: 1px solid var(--color-border-default);
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - var(--cut)),
+    calc(100% - var(--cut)) 100%,
+    0 100%
+  );
+}
+
+/* ---------- Profilo giocatore ---------- */
+.trophies-profile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-6);
+  padding: var(--space-6);
+}
+
+.trophies-profile .trophies-profile__avatar {
+  width: 80px;
+  border-width: 3px;
+}
+
+.trophies-profile__level {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.trophies-profile__name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) 14px;
+}
+
+/* Heading/H1: Teko 72px (su desktop) */
+.trophies-profile__name h1 {
+  font-size: var(--font-size-4xl);
+  line-height: 0.9;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.trophies-profile__xp {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.45;
+}
+
+.trophies-profile__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+/* ---------- Prossimi traguardi ---------- */
+.trophies-goals {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+.trophies-goals__list {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.trophies-goals__list > li {
+  display: grid;
+}
+
+/* ---------- Filtri + griglia ---------- */
+.trophies-all {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  padding-top: var(--space-3);
+}
+
+.trophies-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.trophies-filters__categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.trophies-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+
+.trophies-empty {
+  padding: var(--space-10) var(--space-4);
+  border: 1px dashed var(--color-border-strong);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+/* ---------- Ricompense ---------- */
+.trophies-rewards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-6);
+}
+
+.trophies-rewards__text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.trophies-rewards__description {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.45;
+}
+
+.trophies-rewards__list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-6);
+}
+
+/* ---------- Tablet ---------- */
+@media (min-width: 48rem) {
+  .trophies-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .trophies-rewards__list {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* ---------- Desktop ---------- */
+@media (min-width: 64rem) {
+  .trophies {
+    padding-block: var(--space-12) var(--space-24);
+  }
+
+  .trophies-profile {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-8);
+    padding: var(--space-8);
+  }
+
+  .trophies-profile .trophies-profile__avatar {
+    width: 120px;
+    border-width: 4.5px;
+  }
+
+  .trophies-profile__level {
+    flex: 1;
+    align-self: auto;
+  }
+
+  .trophies-profile__name h1 {
+    font-size: var(--font-size-6xl);
+  }
+
+  .trophies-profile__stats {
+    flex-wrap: nowrap;
+  }
+
+  .trophies-goals__list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .trophies-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .trophies-rewards {
+    flex-direction: row;
+    align-items: flex-start;
+    padding: var(--space-8);
+  }
+
+  .trophies-rewards__text {
+    flex: 0 0 18.75rem; /* 300px */
+  }
+
+  .trophies-rewards__list {
+    flex: 1;
+  }
+}

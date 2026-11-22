@@ -40,17 +40,16 @@ export default function Matchmaking({ match, onStart }) {
 }
 
 function PlayerIntro({ player }) {
+  const cardCount = player.deck.length;
   return (
     <section className="player-intro" aria-label={`@${player.username}`}>
-      <Avatar src={player.avatar} size={160} className="player-intro__avatar" />
+      <Avatar size={160} className="player-intro__avatar" />
       <h2 className="player-intro__name">@{player.username}</h2>
-      <span className="match-level">Liv. {player.level}</span>
-      <p className="player-intro__deck">Mazzo: {player.deckName}</p>
-      <p className="player-intro__stats">
-        {player.wins} vittorie · {player.winRate}%
+      <p className="player-intro__deck">
+        Mazzo: {cardCount} {cardCount === 1 ? 'carta' : 'carte'}
       </p>
       <div className="player-intro__cards">
-        {Array.from({ length: DECK_PREVIEW }, (_, i) => (
+        {Array.from({ length: Math.min(DECK_PREVIEW, cardCount) }, (_, i) => (
           <CardBack key={i} />
         ))}
       </div>

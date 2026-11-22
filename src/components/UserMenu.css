@@ -18,3 +18,11 @@
     display: inline-flex;
   }
 }
+
+.user-menu__nickname {
+  font-weight: var(--font-weight-semibold);
+}
+
+.user-menu__logout {
+  padding-block: var(--space-1);
+}

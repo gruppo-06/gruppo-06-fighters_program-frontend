@@ -6,8 +6,10 @@
  * Per aggiungere una rotta: crea il componente in ./routes/ e aggiungi
  * una voce in `children` (e, se serve, un link in layout/AppLayout.jsx).
  */
-import { createBrowserRouter } from 'react-router-dom';
+import { Navigate, createBrowserRouter } from 'react-router-dom';
 import AppLayout from './layout/AppLayout.jsx';
+import RequireAuth from './RequireAuth.jsx';
+import Accesso from './routes/Accesso.jsx';
 import Collezione from './routes/Collezione.jsx';
 import Negozio from './routes/Negozio.jsx';
 import NotFound from './routes/NotFound.jsx';
@@ -16,14 +18,25 @@ import Trofei from './routes/Trofei.jsx';
 
 export const router = createBrowserRouter(
   [
+    { path: '/accesso', element: <Accesso /> },
     // Partita: schermata a tutta pagina, fuori da AppLayout (niente navbar)
-    { path: '/partita', element: <Partita /> },
+    {
+      path: '/partita',
+      element: (
+        <RequireAuth>
+          <Partita />
+        </RequireAuth>
+      ),
+    },
     {
       path: '/',
-      element: <AppLayout />,
+      element: (
+        <RequireAuth>
+          <AppLayout />
+        </RequireAuth>
+      ),
       children: [
-        // TODO: aggiungere qui le rotte dell'area giocatore man mano che vengono implementate
-        // (login, registrazione, dashboard, collezione, mazzi, scambi, sfide, trofei, …)
+        { index: true, element: <Navigate to="/collezione" replace /> },
         { path: 'negozio', element: <Negozio /> },
         { path: 'collezione', element: <Collezione /> },
         { path: 'trofei', element: <Trofei /> },

@@ -10,6 +10,7 @@ import { Navigate, createBrowserRouter } from 'react-router-dom';
 import AppLayout from './layout/AppLayout.jsx';
 import RequireAuth from './RequireAuth.jsx';
 import Accesso from './routes/Accesso.jsx';
+import Amici from './routes/Amici.jsx';
 import AperturaPacchetto from './routes/AperturaPacchetto.jsx';
 import Collezione from './routes/Collezione.jsx';
 import Negozio from './routes/Negozio.jsx';
@@ -58,6 +59,7 @@ export const router = createBrowserRouter(
         { path: 'mazzi/:deckId', element: <MazzoEditor /> },
         { path: 'scambi', element: <Scambi /> },
         { path: 'sfide', element: <Sfide /> },
+        { path: 'amici', element: <Amici /> },
         { path: 'trofei', element: <Trofei /> },
         { path: '*', element: <NotFound /> },
       ],

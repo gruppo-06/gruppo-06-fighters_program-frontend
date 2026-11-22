@@ -1,0 +1,231 @@
+/* Pagina Amici. Mobile-first. */
+
+.amici {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding-block: var(--space-8) var(--space-16);
+}
+
+/* Spaziature gestite con gap: annulliamo quelle generiche di base.css */
+.amici p {
+  margin: 0;
+}
+
+.amici section + section {
+  margin-top: 0;
+}
+
+.amici-title {
+  font-family: var(--font-display);
+  font-size: var(--font-size-5xl);
+  line-height: var(--line-height-display);
+  text-transform: uppercase;
+}
+
+.amici-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  border: 1px solid var(--color-border-default);
+  background: var(--color-background-surface);
+}
+
+.amici-section__title {
+  font-family: var(--font-display);
+  font-size: var(--font-size-3xl);
+  line-height: var(--line-height-display);
+  text-transform: uppercase;
+}
+
+.amici-status,
+.amici-empty {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.amici-empty {
+  padding: var(--space-6) var(--space-4);
+  border: 1px dashed var(--color-border-strong);
+  text-align: center;
+}
+
+.amici-alert {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-accent-primary);
+  background: var(--color-accent-primary-dark);
+  color: var(--color-text-primary);
+}
+
+/* ---------- Form "Aggiungi un amico" ---------- */
+.amici-form {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.amici-field {
+  display: grid;
+  gap: var(--space-1);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.amici-field input {
+  padding: var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-background-surface-sunken);
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: var(--font-size-base);
+}
+
+.amici-field input:focus-visible {
+  outline: 2px solid var(--color-accent-highlight);
+  outline-offset: 1px;
+}
+
+.amici-field input:disabled {
+  opacity: 0.6;
+}
+
+.amici-form .button {
+  justify-self: start;
+}
+
+.amici-form .button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.amici-feedback {
+  font-size: var(--font-size-sm);
+}
+
+.amici-feedback--success {
+  color: var(--color-rarity-rara);
+}
+
+.amici-feedback--error {
+  color: var(--color-accent-highlight);
+}
+
+/* ---------- Liste di richieste ---------- */
+.amici-list {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.amici-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border-default);
+  background: var(--color-background-surface-sunken);
+}
+
+.amici-row__info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.amici-row__title {
+  overflow-wrap: anywhere;
+  font-weight: var(--font-weight-semibold);
+}
+
+.amici-row__meta,
+.amici-card__meta {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.amici-row__actions,
+.amici-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.amici-row__actions .button:disabled,
+.amici-card__actions .button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ---------- Card degli amici ---------- */
+.amici-grid {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.amici-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border-default);
+  background: var(--color-background-surface-sunken);
+}
+
+.amici-card__info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.amici-card__name {
+  overflow-wrap: anywhere;
+  font-weight: var(--font-weight-semibold);
+}
+
+/* ---------- Tablet ---------- */
+@media (min-width: 48rem) {
+  .amici-form {
+    grid-template-columns: 1fr auto;
+    align-items: end;
+  }
+
+  .amici-form .button {
+    justify-self: auto;
+  }
+
+  .amici-feedback {
+    grid-column: 1 / -1;
+  }
+
+  .amici-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .amici-row__info {
+    flex: 1;
+  }
+
+  .amici-row__actions {
+    justify-content: flex-end;
+  }
+
+  .amici-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ---------- Desktop ---------- */
+@media (min-width: 64rem) {
+  .amici {
+    padding-block: var(--space-12) var(--space-24);
+  }
+
+  .amici-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

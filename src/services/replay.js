@@ -32,8 +32,20 @@ function findSnapshot(deck, fighter) {
 }
 
 /** Snapshot del mazzo → fighter per FighterCard. */
+/** Le partite giocate prima della modalità avanzata non hanno VEL e CRT nello snapshot. */
+const MISSING_STAT = '–';
+
 function toReplayFighter(snapshot) {
-  return { ...toFighter(snapshot), image: cardImageUrl(snapshot.code) };
+  const fighter = toFighter(snapshot);
+  return {
+    ...fighter,
+    image: cardImageUrl(snapshot.code),
+    stats: {
+      ...fighter.stats,
+      vel: fighter.stats.vel ?? MISSING_STAT,
+      crt: fighter.stats.crt ?? MISSING_STAT,
+    },
+  };
 }
 
 /**

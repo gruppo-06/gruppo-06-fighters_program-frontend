@@ -16,6 +16,7 @@ import {
   TROPHY_CATEGORIES,
   TROPHY_TIERS,
 } from '../../data/mockTrophies.js';
+import Placeholder from '../../components/Placeholder.jsx';
 import './Trofei.css';
 
 // useGrouping 'always': in italiano Intl non separa le migliaia sotto 10.000 ("1850" → "1.850")
@@ -52,123 +53,133 @@ export default function Trofei() {
 
   return (
     <div className="container trophies">
-      {/* ---------- Profilo giocatore ---------- */}
-      <section className="trophies-profile" aria-labelledby="profile-title">
-        <Avatar src={player.avatar} size={120} className="trophies-profile__avatar" />
-        <div className="trophies-profile__level">
-          <p className="eyebrow">Trofei · Profilo giocatore</p>
-          <div className="trophies-profile__name">
-            <h1 id="profile-title">
-              <span className="visually-hidden">Trofei di </span>@{player.username}
-            </h1>
-            <Tag tone="outline">
-              Liv. {player.level} · {player.levelTitle}
-            </Tag>
+      <div className="trophies-coming-soon">
+        <Placeholder
+          eyebrow="Trofei"
+          title="Trofei in arrivo"
+          description="Presto ogni partita farà avanzare i tuoi trofei, ad esempio “Vinci 5 partite · 4/5”: quando ne completi uno lo sblocchi e ritiri un premio in crediti."
+        />
+      </div>
+      <p className="trophies-preview-label">Anteprima grafica — dati di esempio</p>
+      <div className="trophies-preview" inert>
+        {/* ---------- Profilo giocatore ---------- */}
+        <section className="trophies-profile" aria-labelledby="profile-title">
+          <Avatar src={player.avatar} size={120} className="trophies-profile__avatar" />
+          <div className="trophies-profile__level">
+            <p className="eyebrow">Trofei · Profilo giocatore</p>
+            <div className="trophies-profile__name">
+              <h1 id="profile-title">
+                <span className="visually-hidden">Trofei di </span>@{player.username}
+              </h1>
+              <Tag tone="outline">
+                Liv. {player.level} · {player.levelTitle}
+              </Tag>
+            </div>
+            <ProgressBar
+              value={xpPercent}
+              label={`Esperienza: ${player.xp} su ${player.xpNextLevel} XP`}
+            />
+            <p className="trophies-profile__xp">
+              {formatter.format(player.xp)} / {formatter.format(player.xpNextLevel)} XP · mancano{' '}
+              {formatter.format(xpMissing)} XP al livello {player.level + 1}
+            </p>
           </div>
-          <ProgressBar
-            value={xpPercent}
-            label={`Esperienza: ${player.xp} su ${player.xpNextLevel} XP`}
-          />
-          <p className="trophies-profile__xp">
-            {formatter.format(player.xp)} / {formatter.format(player.xpNextLevel)} XP · mancano{' '}
-            {formatter.format(xpMissing)} XP al livello {player.level + 1}
-          </p>
-        </div>
-        <div className="trophies-profile__stats">
-          <StatBox value={`${player.trophiesUnlocked}/${player.trophiesTotal}`} label="trofei" />
-          <StatBox value={formatter.format(player.wins)} label="vittorie" />
-          <StatBox value={formatter.format(player.creditsWon)} label="crediti vinti" />
-        </div>
-      </section>
-
-      {/* ---------- Prossimi traguardi ---------- */}
-      <section className="trophies-goals" aria-labelledby="goals-title">
-        <header className="section-header">
-          <p className="eyebrow">Quasi fatto</p>
-          <h2 id="goals-title" className="section-header__title">
-            Prossimi traguardi
-          </h2>
-        </header>
-        <ul className="trophies-goals__list" role="list">
-          {goals.map((trophy) => (
-            <li key={trophy.id}>
-              <GoalCard
-                tag={`${categoryLabel(trophy.category)} · ${TROPHY_TIERS[trophy.tier]}`}
-                title={trophy.title}
-                description={trophy.description}
-                progress={trophy.progress}
-                reward={trophy.reward}
-                image={trophy.image}
-              />
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {/* ---------- Tutti i trofei ---------- */}
-      <section className="trophies-all" aria-labelledby="all-title">
-        <h2 id="all-title" className="visually-hidden">
-          Tutti i trofei
-        </h2>
-        <div className="trophies-filters">
-          <div className="trophies-filters__categories" role="group" aria-label="Categoria">
-            <Chip selected={category === 'all'} onClick={() => setCategory('all')}>
-              Tutti · {trophies.length}
-            </Chip>
-            {TROPHY_CATEGORIES.map(({ id, label }) => (
-              <Chip key={id} selected={category === id} onClick={() => setCategory(id)}>
-                {label}
-              </Chip>
-            ))}
+          <div className="trophies-profile__stats">
+            <StatBox value={`${player.trophiesUnlocked}/${player.trophiesTotal}`} label="trofei" />
+            <StatBox value={formatter.format(player.wins)} label="vittorie" />
+            <StatBox value={formatter.format(player.creditsWon)} label="crediti vinti" />
           </div>
-          <ChipSelect
-            label="Mostra"
-            value={status}
-            options={STATUS_OPTIONS}
-            onChange={setStatus}
-            emptyValue="all"
-          />
-        </div>
+        </section>
 
-        {visibleTrophies.length > 0 ? (
-          <ul className="trophies-grid" role="list">
-            {visibleTrophies.map((trophy) => (
+        {/* ---------- Prossimi traguardi ---------- */}
+        <section className="trophies-goals" aria-labelledby="goals-title">
+          <header className="section-header">
+            <p className="eyebrow">Quasi fatto</p>
+            <h2 id="goals-title" className="section-header__title">
+              Prossimi traguardi
+            </h2>
+          </header>
+          <ul className="trophies-goals__list" role="list">
+            {goals.map((trophy) => (
               <li key={trophy.id}>
-                <TrophyCard
-                  status={trophy.status}
-                  category={`${TROPHY_TIERS[trophy.tier]} · ${categoryLabel(trophy.category)}`}
+                <GoalCard
+                  tag={`${categoryLabel(trophy.category)} · ${TROPHY_TIERS[trophy.tier]}`}
                   title={trophy.title}
                   description={trophy.description}
                   progress={trophy.progress}
                   reward={trophy.reward}
+                  image={trophy.image}
                 />
               </li>
             ))}
           </ul>
-        ) : (
-          <p className="trophies-empty">Nessun trofeo corrisponde ai filtri selezionati.</p>
-        )}
-      </section>
+        </section>
 
-      {/* ---------- Ricompense ---------- */}
-      <section className="trophies-rewards" aria-labelledby="rewards-title">
-        <div className="trophies-rewards__text">
-          <p className="eyebrow">Ricompense</p>
-          <h2 id="rewards-title" className="section-header__title">
-            Cosa puoi vincere
+        {/* ---------- Tutti i trofei ---------- */}
+        <section className="trophies-all" aria-labelledby="all-title">
+          <h2 id="all-title" className="visually-hidden">
+            Tutti i trofei
           </h2>
-          <p className="trophies-rewards__description">
-            I crediti vinti rientrano nel ciclo pacchetti → collezione → sfide.
-          </p>
-        </div>
-        <ul className="trophies-rewards__list" role="list">
-          {REWARD_TYPES.map((reward) => (
-            <li key={reward.id}>
-              <RewardTile {...reward} />
-            </li>
-          ))}
-        </ul>
-      </section>
+          <div className="trophies-filters">
+            <div className="trophies-filters__categories" role="group" aria-label="Categoria">
+              <Chip selected={category === 'all'} onClick={() => setCategory('all')}>
+                Tutti · {trophies.length}
+              </Chip>
+              {TROPHY_CATEGORIES.map(({ id, label }) => (
+                <Chip key={id} selected={category === id} onClick={() => setCategory(id)}>
+                  {label}
+                </Chip>
+              ))}
+            </div>
+            <ChipSelect
+              label="Mostra"
+              value={status}
+              options={STATUS_OPTIONS}
+              onChange={setStatus}
+              emptyValue="all"
+            />
+          </div>
+
+          {visibleTrophies.length > 0 ? (
+            <ul className="trophies-grid" role="list">
+              {visibleTrophies.map((trophy) => (
+                <li key={trophy.id}>
+                  <TrophyCard
+                    status={trophy.status}
+                    category={`${TROPHY_TIERS[trophy.tier]} · ${categoryLabel(trophy.category)}`}
+                    title={trophy.title}
+                    description={trophy.description}
+                    progress={trophy.progress}
+                    reward={trophy.reward}
+                  />
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="trophies-empty">Nessun trofeo corrisponde ai filtri selezionati.</p>
+          )}
+        </section>
+
+        {/* ---------- Ricompense ---------- */}
+        <section className="trophies-rewards" aria-labelledby="rewards-title">
+          <div className="trophies-rewards__text">
+            <p className="eyebrow">Ricompense</p>
+            <h2 id="rewards-title" className="section-header__title">
+              Cosa puoi vincere
+            </h2>
+            <p className="trophies-rewards__description">
+              I crediti vinti rientrano nel ciclo pacchetti → collezione → sfide.
+            </p>
+          </div>
+          <ul className="trophies-rewards__list" role="list">
+            {REWARD_TYPES.map((reward) => (
+              <li key={reward.id}>
+                <RewardTile {...reward} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      </div>
     </div>
   );
 }

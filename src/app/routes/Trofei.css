@@ -224,3 +224,23 @@
     flex: 1;
   }
 }
+
+/* Trofei non ancora nel backend: segnaposto in cima, la grafica sotto come anteprima non interattiva */
+.trophies-coming-soon {
+  margin-bottom: var(--space-8);
+}
+
+.trophies-preview-label {
+  margin-bottom: var(--space-4);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-eyebrow);
+  text-transform: uppercase;
+}
+
+.trophies-preview {
+  opacity: 0.6;
+  pointer-events: none;
+  user-select: none;
+}

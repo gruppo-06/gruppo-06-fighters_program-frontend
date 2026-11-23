@@ -18,8 +18,10 @@ import NotFound from './routes/NotFound.jsx';
 import Mazzi from './routes/Mazzi.jsx';
 import MazzoEditor from './routes/mazzi/MazzoEditor.jsx';
 import Partita from './routes/Partita.jsx';
+import Pass from './routes/Pass.jsx';
 import Scambi from './routes/Scambi.jsx';
 import Sfide from './routes/Sfide.jsx';
+import Skin from './routes/Skin.jsx';
 import Trofei from './routes/Trofei.jsx';
 
 export const router = createBrowserRouter(
@@ -53,6 +55,8 @@ export const router = createBrowserRouter(
       children: [
         { index: true, element: <Navigate to="/collezione" replace /> },
         { path: 'negozio', element: <Negozio /> },
+        { path: 'skin', element: <Skin /> },
+        { path: 'pass', element: <Pass /> },
         { path: 'collezione', element: <Collezione /> },
         { path: 'mazzi', element: <Mazzi /> },
         // :deckId è l'id del mazzo, oppure "nuovo" (NEW_DECK_ID) per crearne uno

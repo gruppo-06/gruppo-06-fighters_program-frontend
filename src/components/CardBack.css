@@ -1,0 +1,23 @@
+.card-back {
+  container-type: inline-size;
+  display: flex;
+  flex-shrink: 0;
+  width: 5.5rem;
+  aspect-ratio: 90 / 125;
+  background: var(--color-background-surface);
+  border: 1.5px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+}
+
+.card-back__logo {
+  display: grid;
+  flex: 1;
+  place-items: center;
+  margin: 7cqi;
+  border: 1px dashed var(--color-accent-primary);
+  color: var(--color-accent-primary-light);
+  font-family: var(--font-display);
+  font-size: 38cqi;
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+}

@@ -1,0 +1,67 @@
+/*
+ * Trofeo con avanzamento (Figma: TrophyItem + ProgressBar).
+ *   <li class="trophy [trophy--unlocked]">
+ *     <span class="trophy__badge"><span class="icon icon--trophy" aria-hidden="true"></span></span>
+ *     <p class="trophy__title">Vinci 5 partite</p>
+ *     <div class="progress-bar" role="progressbar" aria-valuenow="80" …>
+ *       <span class="progress-bar__fill" style="--value: 80%"></span>
+ *     </div>
+ *     <p class="trophy__progress">4 / 5</p>
+ *   </li>
+ */
+.trophy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  width: 7.5rem;
+  text-align: center;
+}
+
+.trophy__badge {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 1;
+  border: 1.5px solid var(--color-border-strong);
+  border-radius: 50%;
+  background: var(--color-background-surface-sunken);
+  color: var(--color-text-secondary);
+}
+
+.trophy__badge .icon {
+  --icon-size: 2.75rem;
+}
+
+.trophy--unlocked .trophy__badge {
+  border-color: var(--color-accent-highlight);
+  background: color-mix(in srgb, var(--color-accent-highlight) 12%, transparent);
+  color: var(--color-accent-highlight);
+}
+
+.trophy__title {
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  white-space: nowrap;
+}
+
+.trophy__progress {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.45;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--color-border-default);
+}
+
+.progress-bar__fill {
+  display: block;
+  width: var(--value, 0%);
+  height: 100%;
+  background: var(--color-accent-highlight);
+}

@@ -1,0 +1,13 @@
+/* Punto d'ingresso degli stili globali: l'ordine conta. */
+@import './variables.css';
+@import './reset.css';
+@import './base.css';
+@import './icons.css';
+
+/* Componenti condivisi (usabili in tutte le pagine statiche) */
+@import './components/button.css';
+@import './components/section-header.css';
+@import './components/step-card.css';
+@import './components/faction-card.css';
+@import './components/trophy.css';
+@import './components/placeholder-section.css';

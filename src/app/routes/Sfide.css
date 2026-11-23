@@ -1,0 +1,291 @@
+/* Pagina Sfide. Mobile-first. */
+
+.sfide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding-block: var(--space-8) var(--space-16);
+}
+
+/* Spaziature gestite con gap: annulliamo quelle generiche di base.css */
+.sfide p {
+  margin: 0;
+}
+
+.sfide section + section {
+  margin-top: 0;
+}
+
+.sfide-title {
+  font-family: var(--font-display);
+  font-size: var(--font-size-5xl);
+  line-height: var(--line-height-display);
+  text-transform: uppercase;
+}
+
+.sfide-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  border: 1px solid var(--color-border-default);
+  background: var(--color-background-surface);
+}
+
+.sfide-section__title {
+  font-family: var(--font-display);
+  font-size: var(--font-size-3xl);
+  line-height: var(--line-height-display);
+  text-transform: uppercase;
+}
+
+.sfide-status,
+.sfide-empty {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.sfide-empty {
+  padding: var(--space-6) var(--space-4);
+  border: 1px dashed var(--color-border-strong);
+  text-align: center;
+}
+
+.sfide-empty a {
+  color: var(--color-accent-link);
+}
+
+.sfide-alert {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-accent-primary);
+  background: var(--color-accent-primary-dark);
+  color: var(--color-text-primary);
+}
+
+/* ---------- Form "Lancia una sfida" ---------- */
+.sfide-form {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.sfide-field {
+  display: grid;
+  gap: var(--space-1);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.sfide-field input,
+.sfide-field select {
+  padding: var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-background-surface-sunken);
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: var(--font-size-base);
+}
+
+.sfide-field input:focus-visible,
+.sfide-field select:focus-visible {
+  outline: 2px solid var(--color-accent-highlight);
+  outline-offset: 1px;
+}
+
+.sfide-field select:disabled {
+  opacity: 0.6;
+}
+
+/* Scelta della modalità: due pulsanti segmentati (radio nascosti) */
+.sfide-mode {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.sfide-mode legend {
+  margin-bottom: var(--space-1);
+  padding: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.sfide-mode__options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-background-surface-sunken);
+}
+
+.sfide-mode__option {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: 1px solid transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.sfide-mode__option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sfide-mode__option:has(input:checked) {
+  background: var(--color-background-surface);
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
+}
+
+.sfide-mode__option:has(input:focus-visible) {
+  outline: 2px solid var(--color-accent-highlight);
+  outline-offset: 1px;
+}
+
+.sfide-mode__option:has(input:disabled) {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.sfide-mode__name {
+  font-weight: var(--font-weight-semibold);
+}
+
+.sfide-mode__hint {
+  font-size: var(--font-size-xs);
+}
+
+.sfide-form .button {
+  justify-self: start;
+}
+
+.sfide-form .button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.sfide-feedback {
+  font-size: var(--font-size-sm);
+}
+
+.sfide-feedback--success {
+  color: var(--color-rarity-rara);
+}
+
+.sfide-feedback--error {
+  color: var(--color-accent-highlight);
+}
+
+/* ---------- Liste di sfide e storico ---------- */
+.sfide-list {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.sfide-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border-default);
+  background: var(--color-background-surface-sunken);
+}
+
+.sfide-row__info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.sfide-row__title {
+  overflow-wrap: anywhere;
+  font-weight: var(--font-weight-semibold);
+}
+
+.sfide-row__meta {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.sfide-row__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-3);
+}
+
+.sfide-row__mode {
+  margin-left: var(--space-2);
+  vertical-align: middle;
+}
+
+.sfide-row__actions .sfide-field {
+  flex: 1 1 12rem;
+}
+
+.sfide-row__actions .button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Esito della partita: il colore del Tag segue l'esito */
+.sfide .sfide-result--win {
+  --tag-color: var(--color-rarity-rara);
+}
+
+.sfide .sfide-result--loss {
+  --tag-color: var(--color-accent-highlight);
+}
+
+.sfide .sfide-result--draw {
+  --tag-color: var(--color-rarity-comune);
+}
+
+/* ---------- Tablet ---------- */
+@media (min-width: 48rem) {
+  .sfide-form {
+    grid-template-columns: 1fr 1fr auto;
+    align-items: end;
+  }
+
+  .sfide-form .button {
+    justify-self: auto;
+  }
+
+  .sfide-mode,
+  .sfide-feedback {
+    grid-column: 1 / -1;
+  }
+
+  .sfide-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .sfide-row__info {
+    flex: 1;
+  }
+
+  .sfide-row__actions {
+    justify-content: flex-end;
+    align-items: flex-end;
+  }
+}
+
+/* ---------- Desktop ---------- */
+@media (min-width: 64rem) {
+  .sfide {
+    padding-block: var(--space-12) var(--space-24);
+  }
+}

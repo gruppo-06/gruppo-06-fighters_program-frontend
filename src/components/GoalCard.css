@@ -1,0 +1,95 @@
+/* Card "Prossimi traguardi" (Figma: GoalCard) */
+.goal-card {
+  --cut: var(--cut-md);
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  min-height: 18.75rem; /* 300px */
+  padding: var(--space-6);
+  overflow: hidden;
+  background: var(--color-background-surface);
+  border: 1px solid var(--color-border-default);
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - var(--cut)),
+    calc(100% - var(--cut)) 100%,
+    0 100%
+  );
+}
+
+.goal-card p {
+  margin: 0;
+}
+
+/* Illustrazione a tutta card, sotto la sfumatura */
+.goal-card__image {
+  position: absolute;
+  inset: -1px;
+  z-index: -2;
+  width: calc(100% + 2px);
+  height: calc(100% + 2px);
+  object-fit: cover;
+}
+
+.goal-card__image--placeholder {
+  display: grid;
+  place-items: center;
+  background: var(--color-background-placeholder);
+  border: 1px dashed var(--color-border-strong);
+  color: var(--color-text-muted);
+}
+
+/* Sfumatura verso il basso per la leggibilità del testo */
+.goal-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    to bottom,
+    transparent 20%,
+    color-mix(in srgb, var(--color-background-page) 95%, transparent) 75%
+  );
+}
+
+/* Heading/H3: Teko 38px */
+.goal-card__title {
+  font-size: var(--font-size-3xl);
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.goal-card__description {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: 1.45;
+}
+
+.goal-card__progress {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+  white-space: nowrap;
+}
+
+.goal-card__count {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+}
+
+.goal-card__reward {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25em;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.45;
+}

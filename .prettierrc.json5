@@ -1,0 +1,24 @@
+/**
+ * Prettier: riformatta automaticamente il codice.
+ *
+ * Come si usa, da terminale:
+ *
+ *   npm run format         # riformatta tutti i file del progetto
+ *   npm run format:check   # controlla soltanto, senza modificare nulla
+ */
+{
+  // Virgolette singole: 'ciao' invece di "ciao"
+  singleQuote: true,
+
+  // Punto e virgola a fine istruzione
+  semi: true,
+
+  // Virgola anche dopo l'ultimo elemento di liste/oggetti su più righe
+  trailingComma: 'all',
+
+  // Lunghezza massima di una riga prima di andare a capo
+  printWidth: 100,
+
+  // A capo stile Linux/Mac (coerente con .editorconfig)
+  endOfLine: 'lf',
+}

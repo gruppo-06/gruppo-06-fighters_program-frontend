@@ -1,0 +1,270 @@
+/*
+ * Apertura pacchetto (Figma 249:9562). Mobile-first:
+ * carte a scorrimento orizzontale, da 64rem ventaglio (5 carte) o griglia.
+ */
+
+.pack-opening {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  min-width: 0;
+  padding-block: var(--space-10) var(--space-16);
+}
+
+.pack-opening p {
+  margin: 0;
+}
+
+.pack-opening__title {
+  padding-inline: var(--space-4);
+  font-size: var(--font-size-4xl);
+  line-height: 0.9;
+  text-align: center;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+/* Riceve il focus solo via script, all'apertura */
+.pack-opening__title:focus {
+  outline: none;
+}
+
+/* ---------- Carte ---------- */
+/* Doppia classe per vincere su ul[role='list'] di reset.css */
+.pack-opening .pack-opening__cards {
+  position: relative; /* riferimento per le carte del ventaglio */
+  display: flex;
+  justify-content: safe center;
+  gap: var(--space-4);
+  width: 100%;
+  padding: var(--space-4);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+}
+
+.pack-opening__card {
+  flex-shrink: 0;
+  width: min(252px, 78vw);
+  aspect-ratio: 252 / 341;
+  scroll-snap-align: center;
+}
+
+.pack-opening__card--comune {
+  --card-color: var(--color-rarity-comune);
+}
+
+.pack-opening__card--rara {
+  --card-color: var(--color-rarity-rara);
+}
+
+.pack-opening__card--epica {
+  --card-color: var(--color-rarity-epica);
+}
+
+.pack-opening__card--leggendaria {
+  --card-color: var(--color-rarity-leggendaria);
+}
+
+/*
+ * Variante della FighterCard di questo mockup, senza toccare quella di Partita.
+ * La carta piena ha 250px interni: 0.4cqi = 1px.
+ */
+.pack-opening .fighter-card {
+  height: 100%;
+  border-color: var(--card-color);
+  box-shadow: none;
+}
+
+.pack-opening .fighter-card__art {
+  flex: none;
+  height: 76cqi;
+  border: 0;
+}
+
+/* Tratteggio su tre lati: a destra esce dalla carta */
+.pack-opening .fighter-card__art::before {
+  content: '';
+  position: absolute;
+  inset: 0 -1.2cqi 0 0;
+  border: 1px dashed var(--color-border-strong);
+}
+
+.pack-opening .fighter-card__placeholder {
+  width: 9.6cqi;
+  height: 9.6cqi;
+}
+
+.pack-opening .fighter-card__number,
+.pack-opening .fighter-card__element,
+.pack-opening .fighter-card .fighter-card__rarity {
+  padding: 1.6cqi 3.2cqi;
+  font-size: 4.4cqi;
+  letter-spacing: 0.1em;
+}
+
+.pack-opening .fighter-card__number,
+.pack-opening .fighter-card__element {
+  background: var(--color-background-surface-sunken);
+}
+
+.pack-opening .fighter-card .fighter-card__number {
+  padding-inline: 2.8cqi;
+}
+
+.pack-opening .fighter-card .fighter-card__rarity {
+  right: 2.8cqi;
+}
+
+.pack-opening .tag,
+.pack-opening .fighter-card .fighter-card__rarity {
+  background: color-mix(in srgb, var(--tag-color) 15%, transparent);
+}
+
+.pack-opening .tag--comune,
+.pack-opening .fighter-card .fighter-card__rarity.tag--comune {
+  background: color-mix(in srgb, var(--tag-color) 12%, transparent);
+}
+
+.pack-opening .fighter-card__body {
+  gap: 0;
+  padding: 4.8cqi 5.6cqi 5.6cqi;
+}
+
+.pack-opening .fighter-card__name {
+  font-size: 11.2cqi;
+  line-height: 1;
+}
+
+.pack-opening .fighter-card__meta {
+  font-size: 5.6cqi;
+  line-height: 1.45;
+  white-space: nowrap;
+}
+
+.pack-opening .fighter-card__stats {
+  margin-top: 4cqi;
+}
+
+.pack-opening .fighter-card__stats dt,
+.pack-opening .fighter-card__subcards {
+  color: var(--color-text-muted);
+  font-size: 4.4cqi;
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+}
+
+.pack-opening .fighter-card__stats dd {
+  font-size: 11.2cqi;
+  line-height: 1;
+}
+
+.pack-opening .fighter-card .fighter-card__subcards {
+  gap: 2.4cqi;
+  margin-top: 4cqi;
+}
+
+.pack-opening .fighter-card__slots {
+  gap: 2.4cqi;
+}
+
+/* ---------- Riepilogo e azioni ---------- */
+.pack-opening .pack-opening__summary {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+  padding-inline: var(--space-4);
+}
+
+.pack-opening__summary li {
+  display: flex;
+}
+
+.pack-opening__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4) 0;
+}
+
+.pack-opening__actions .button {
+  padding: 14px var(--space-6);
+}
+
+@media (min-width: 64rem) {
+  .pack-opening {
+    padding-block: 72px var(--space-24);
+  }
+
+  .pack-opening__title {
+    font-size: var(--font-size-6xl);
+  }
+
+  .pack-opening .pack-opening__cards--grid {
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 75rem;
+    overflow: visible;
+  }
+
+  .pack-opening__cards--grid .pack-opening__card {
+    width: 214.2px;
+  }
+
+  .pack-opening .pack-opening__cards--fan {
+    display: block;
+    height: 460px;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  /* --x e --y: centro della carta, rispetto al centro orizzontale e al bordo alto */
+  .pack-opening__cards--fan .pack-opening__card {
+    position: absolute;
+    top: var(--y);
+    left: calc(50% + var(--x));
+    z-index: var(--layer);
+    width: 214.2px;
+    translate: -50% -50%;
+    rotate: var(--angle);
+  }
+
+  .pack-opening__cards--fan .pack-opening__card:nth-child(1) {
+    --x: -359.34px;
+    --y: 234.27px;
+    --angle: -10deg;
+    --layer: 1;
+  }
+
+  .pack-opening__cards--fan .pack-opening__card:nth-child(2) {
+    --x: -150.66px;
+    --y: 215.19px;
+    --angle: -5deg;
+    --layer: 2;
+  }
+
+  .pack-opening__cards--fan .pack-opening__card:nth-child(3) {
+    --x: 0px;
+    --y: 190.5px;
+    --angle: 0deg;
+    --layer: 5;
+    width: 252px;
+  }
+
+  .pack-opening__cards--fan .pack-opening__card:nth-child(4) {
+    --x: 154.08px;
+    --y: 215.86px;
+    --angle: 5deg;
+    --layer: 3;
+  }
+
+  .pack-opening__cards--fan .pack-opening__card:nth-child(5) {
+    --x: 350.34px;
+    --y: 241.47px;
+    --angle: 10deg;
+    --layer: 4;
+  }
+}

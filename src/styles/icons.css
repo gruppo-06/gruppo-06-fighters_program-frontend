@@ -1,0 +1,120 @@
+/*
+ * Icone per le pagine statiche (HTML senza React).
+ * Uso: <span class="icon icon--search" aria-hidden="true"></span>
+ * Il colore segue `color` del contenitore; la dimensione si cambia con --icon-size.
+ * Nella SPA React usare invece il componente <Icon name="search" />.
+ */
+.icon {
+  --icon-size: 1.5rem;
+  display: inline-block;
+  flex-shrink: 0;
+  width: var(--icon-size);
+  height: var(--icon-size);
+  vertical-align: middle;
+  background-color: currentColor;
+  mask: var(--icon-url) center / contain no-repeat;
+}
+
+.icon--sm {
+  --icon-size: 1rem;
+}
+
+.icon--lg {
+  --icon-size: 2rem;
+}
+
+.icon--alert {
+  --icon-url: url('../icons/alert.svg');
+}
+
+.icon--arrow-right {
+  --icon-url: url('../icons/arrow-right.svg');
+}
+
+.icon--cards {
+  --icon-url: url('../icons/cards.svg');
+}
+
+.icon--check {
+  --icon-url: url('../icons/check.svg');
+}
+
+.icon--chevron-down {
+  --icon-url: url('../icons/chevron-down.svg');
+}
+
+.icon--chevron-left {
+  --icon-url: url('../icons/chevron-left.svg');
+}
+
+.icon--close {
+  --icon-url: url('../icons/close.svg');
+}
+
+.icon--credits {
+  --icon-url: url('../icons/credits.svg');
+}
+
+.icon--deck {
+  --icon-url: url('../icons/deck.svg');
+}
+
+.icon--edit {
+  --icon-url: url('../icons/edit.svg');
+}
+
+.icon--home {
+  --icon-url: url('../icons/home.svg');
+}
+
+.icon--image {
+  --icon-url: url('../icons/image.svg');
+}
+
+.icon--lock {
+  --icon-url: url('../icons/lock.svg');
+}
+
+.icon--menu {
+  --icon-url: url('../icons/menu.svg');
+}
+
+.icon--minus {
+  --icon-url: url('../icons/minus.svg');
+}
+
+.icon--pause {
+  --icon-url: url('../icons/pause.svg');
+}
+
+.icon--play {
+  --icon-url: url('../icons/play.svg');
+}
+
+.icon--plus {
+  --icon-url: url('../icons/plus.svg');
+}
+
+.icon--search {
+  --icon-url: url('../icons/search.svg');
+}
+
+.icon--shop {
+  --icon-url: url('../icons/shop.svg');
+}
+
+.icon--skip-back {
+  --icon-url: url('../icons/skip-back.svg');
+}
+
+.icon--skip-forward {
+  --icon-url: url('../icons/skip-forward.svg');
+}
+
+.icon--star {
+  --icon-url: url('../icons/star.svg');
+}
+
+.icon--trophy {
+  --icon-url: url('../icons/trophy.svg');
+}

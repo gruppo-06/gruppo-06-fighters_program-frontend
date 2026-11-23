@@ -1,0 +1,15 @@
+#Questo file dice all'editor come scrivere i file: che tipo di indentazione usare, che codifica, come andare a capo. Serve perché tutti quelli che lavorano al progetto, con editor diversi (VS Code, WebStorm, ecc.), salvino i file nello stesso modo.
+
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.md]
+trim_trailing_whitespace = false

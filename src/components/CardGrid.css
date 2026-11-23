@@ -1,0 +1,27 @@
+/* Mobile-first: 1 colonna, poi le colonne crescono con lo spazio disponibile */
+.card-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
+@media (min-width: 30rem) {
+  .card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  }
+}
+
+/* ---------- Pagina catalogo ---------- */
+.catalog-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
+}
+
+.catalog-status {
+  padding: var(--space-12) var(--space-4);
+  border: 1px dashed var(--color-border-default);
+  color: var(--color-text-muted);
+  text-align: center;
+}

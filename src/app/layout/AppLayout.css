@@ -1,0 +1,18 @@
+#app-root {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* Header: stili condivisi con il sito pubblico (.site-header in base.css) */
+
+/* Le spaziature verticali le gestisce ogni rotta */
+.app-main {
+  flex: 1;
+  padding-block: 0;
+}
+
+/* Rotte semplici senza layout dedicato (es. NotFound) */
+.app-page {
+  padding-block: var(--space-8);
+}

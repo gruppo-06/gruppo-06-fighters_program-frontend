@@ -1,7 +1,11 @@
 /** Sfide tra giocatori: lancia una sfida, sfide ricevute, inviate e storico (Figma: SFIDE). */
 import { useCallback, useEffect, useId, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import Placeholder from '../../components/Placeholder.jsx';
+import Price from '../../components/Price.jsx';
+import ProgressBar from '../../components/ProgressBar.jsx';
 import Tag from '../../components/Tag.jsx';
+import { previewDailyChallenges } from '../../data/previewDailyChallenges.js';
 import { ApiError, api } from '../../services/api.js';
 import './Sfide.css';
 
@@ -39,6 +43,14 @@ const formatDate = (value) => dateFormatter.format(new Date(value));
 /** Valore del select dei mazzi: il primo mazzo è preselezionato. */
 const defaultDeckValue = (decks) => (decks[0] ? String(decks[0].id) : '');
 
+function quickMatchErrorMessage(error) {
+  if (!(error instanceof ApiError)) return ACTION_ERROR;
+  if (error.status === 409) return 'Nessun avversario disponibile al momento, riprova tra poco';
+  if (error.status === 400) return error.message;
+  if (error.status === 422) return 'Il mazzo non è valido';
+  return ACTION_ERROR;
+}
+
 function challengeErrorMessage(error) {
   if (!(error instanceof ApiError)) return ACTION_ERROR;
   if (error.status === 404) return 'Giocatore non trovato';
@@ -52,6 +64,8 @@ function challengeErrorMessage(error) {
 
 export default function Sfide() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const prefillNickname = searchParams.get('avversario') ?? '';
   // null finché non arrivano le risposte del backend
   const [decks, setDecks] = useState(null);
   const [incoming, setIncoming] = useState(null);
@@ -132,13 +146,19 @@ export default function Sfide() {
         </p>
       )}
 
+      {/* ---------- Partita rapida ---------- */}
+      <QuickMatch decks={decks} />
+
       {/* ---------- Lancia una sfida ---------- */}
       <section className="sfide-section" aria-labelledby="challenge-title">
         <h2 id="challenge-title" className="sfide-section__title">
           Lancia una sfida
         </h2>
-        <ChallengeForm decks={decks} onSent={loadLists} />
+        <ChallengeForm decks={decks} onSent={loadLists} initialNickname={prefillNickname} />
       </section>
+
+      {/* ---------- Sfide giornaliere (anteprima) ---------- */}
+      <DailyChallengesPreview />
 
       {/* ---------- Sfide ricevute ---------- */}
       <section className="sfide-section" aria-labelledby="incoming-title">
@@ -204,11 +224,142 @@ function ModeTag({ mode }) {
   );
 }
 
-function ChallengeForm({ decks, onSent }) {
+function ModeFieldset({ name, value, onChange, disabled }) {
+  return (
+    <fieldset className="sfide-mode">
+      <legend>Modalità</legend>
+      <div className="sfide-mode__options">
+        {MODE_OPTIONS.map((option) => (
+          <label key={option.value} className="sfide-mode__option">
+            <input
+              type="radio"
+              name={name}
+              value={option.value}
+              checked={value === option.value}
+              onChange={() => onChange(option.value)}
+              disabled={disabled}
+            />
+            <span className="sfide-mode__name">{option.label}</span>
+            <span className="sfide-mode__hint">{option.hint}</span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+  );
+}
+
+function QuickMatch({ decks }) {
+  const navigate = useNavigate();
+  const deckSelectId = useId();
+  const modeName = useId();
+  const [chosenDeck, setChosenDeck] = useState('');
+  const [mode, setMode] = useState('BASE');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(null);
+
+  const list = decks ?? [];
+  const deckValue = chosenDeck || defaultDeckValue(list);
+  const deck = list.find((item) => String(item.id) === deckValue);
+
+  async function start(event) {
+    event.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      const match = await api.post('/matches/quick', { deckId: deck.id, mode });
+      navigate(`/partita?match=${match.id}`);
+    } catch (err) {
+      setError(quickMatchErrorMessage(err));
+      setBusy(false);
+    }
+  }
+
+  return (
+    <section className="sfide-section sfide-quick" aria-labelledby="quick-title">
+      <h2 id="quick-title" className="sfide-quick__title">
+        Partita rapida
+      </h2>
+      <p className="sfide-quick__hint">
+        Il server sceglie un avversario a caso e la partita parte subito.
+      </p>
+      {decks === null && <p className="sfide-status">Caricamento dei mazzi…</p>}
+      {decks !== null && decks.length === 0 && (
+        <p className="sfide-empty">
+          Non hai ancora nessun mazzo. Crealo nella pagina <Link to="/mazzi">Mazzi</Link> per
+          giocare.
+        </p>
+      )}
+      {decks !== null && decks.length > 0 && (
+        <form className="sfide-form sfide-quick__form" onSubmit={start}>
+          <label className="sfide-field" htmlFor={deckSelectId}>
+            <span>Mazzo</span>
+            <select
+              id={deckSelectId}
+              value={deckValue}
+              onChange={(event) => setChosenDeck(event.target.value)}
+              disabled={busy}
+            >
+              {list.map((item) => (
+                <option key={item.id} value={String(item.id)}>
+                  {item.name} ({item.cardCount} carte)
+                </option>
+              ))}
+            </select>
+          </label>
+          <ModeFieldset name={modeName} value={mode} onChange={setMode} disabled={busy} />
+          <button className="button button--lg sfide-quick__start" type="submit" disabled={busy}>
+            {busy ? 'Ricerca in corso…' : 'Gioca ora'}
+          </button>
+          {error && (
+            <p className="sfide-feedback sfide-feedback--error" role="alert">
+              {error}
+            </p>
+          )}
+        </form>
+      )}
+    </section>
+  );
+}
+
+function DailyChallengesPreview() {
+  return (
+    <Placeholder
+      eyebrow="Sfide giornaliere"
+      title="Sfide giornaliere in arrivo"
+      description="Ogni giorno trovi nuovi obiettivi da completare: quando li porti a termine ritiri un premio in crediti. Ecco come li vedrai."
+    >
+      <p className="sfide-preview-label">Anteprima — dati di esempio</p>
+      <ul className="sfide-goals" role="list">
+        {previewDailyChallenges.map((goal) => (
+          <li key={goal.id} className="sfide-goal">
+            <div className="sfide-goal__head">
+              <p className="sfide-goal__title">{goal.title}</p>
+              <Price amount={goal.reward} size="sm" />
+            </div>
+            <ProgressBar
+              value={(goal.progress / goal.target) * 100}
+              label={`Avanzamento: ${goal.progress} su ${goal.target}`}
+            />
+            <div className="sfide-goal__foot">
+              <p className="sfide-goal__count">
+                {goal.progress}/{goal.target}
+              </p>
+              <button className="button button--secondary" type="button" disabled title="In arrivo">
+                Ritira
+              </button>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </Placeholder>
+  );
+}
+
+function ChallengeForm({ decks, onSent, initialNickname }) {
   const nicknameId = useId();
   const deckSelectId = useId();
   const modeName = useId();
-  const [nickname, setNickname] = useState('');
+  const [nickname, setNickname] = useState(initialNickname);
   const [chosenDeck, setChosenDeck] = useState('');
   const [mode, setMode] = useState('BASE');
   const [busy, setBusy] = useState(false);
@@ -277,25 +428,7 @@ function ChallengeForm({ decks, onSent }) {
           ))}
         </select>
       </label>
-      <fieldset className="sfide-mode">
-        <legend>Modalità</legend>
-        <div className="sfide-mode__options">
-          {MODE_OPTIONS.map((option) => (
-            <label key={option.value} className="sfide-mode__option">
-              <input
-                type="radio"
-                name={modeName}
-                value={option.value}
-                checked={mode === option.value}
-                onChange={() => setMode(option.value)}
-                disabled={busy}
-              />
-              <span className="sfide-mode__name">{option.label}</span>
-              <span className="sfide-mode__hint">{option.hint}</span>
-            </label>
-          ))}
-        </div>
-      </fieldset>
+      <ModeFieldset name={modeName} value={mode} onChange={setMode} disabled={busy} />
       <button className="button" type="submit" disabled={busy}>
         {busy ? 'Invio in corso…' : 'Lancia la sfida'}
       </button>

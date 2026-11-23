@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import Icon from './Icon.jsx';
 import { RARITY_LABELS } from './rarity.js';
 import Tag from './Tag.jsx';
+import { LEGENDARY_ABILITIES } from '../data/previewEffects.js';
 import './CardDetail.css';
 
 const STATS = [
@@ -103,6 +104,18 @@ function CardDetailContent({ card, onClose, onAddToDeck, onProposeTrade }) {
           <Tag tone="outline">Classe · {card.role}</Tag>
           <Tag tone="outline">Fazione · {card.faction}</Tag>
         </div>
+
+        {card.rarity === 'leggendaria' && LEGENDARY_ABILITIES[card.number] && (
+          <div className="card-detail__legendary-ability">
+            <div className="card-detail__legendary-ability-header">
+              <span className="card-detail__legendary-ability-label">Abilità speciale</span>
+              <span className="card-detail__legendary-ability-preview-badge">Anteprima</span>
+            </div>
+            <p className="card-detail__legendary-ability-text">
+              {LEGENDARY_ABILITIES[card.number].text}
+            </p>
+          </div>
+        )}
 
         <p className="card-detail__owned">
           {card.owned

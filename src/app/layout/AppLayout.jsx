@@ -9,7 +9,9 @@ const NAV_LINKS = [
   { to: '/mazzi', label: 'Mazzi' },
   { to: '/scambi', label: 'Scambi' },
   { to: '/sfide', label: 'Sfide' },
+  { to: '/amici', label: 'Amici' },
   { to: '/trofei', label: 'Trofei' },
+  { to: '/pass', label: 'Pass' },
 ];
 
 /**

@@ -1,0 +1,241 @@
+/* Pagina Skin (Figma: SKIN) — Anteprima. Mobile-first. */
+
+.skin {
+  --container-max: calc(75rem + 2 * var(--space-4));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-10);
+  padding-block: var(--space-10) var(--space-16);
+}
+
+/* Spaziature gestite con gap: annulliamo quelle generiche di base.css */
+.skin p {
+  margin: 0;
+}
+
+.skin section + section {
+  margin-top: 0;
+}
+
+/* ---------- Sezioni skin ---------- */
+.skin-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.skin-section__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.skin-section__title {
+  font-size: var(--font-size-3xl);
+  line-height: var(--line-height-display);
+  text-transform: uppercase;
+}
+
+/* ---------- Griglia skin ---------- */
+.skin-grid {
+  display: grid;
+  gap: var(--space-5);
+}
+
+@media (min-width: 48rem) {
+  .skin-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 64rem) {
+  .skin-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ---------- Tile skin ---------- */
+.skin-tile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border-default);
+  background: var(--color-background-surface);
+  border-radius: var(--radius-md);
+  transition:
+    border-color var(--transition),
+    box-shadow var(--transition);
+}
+
+.skin-tile:hover {
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-md);
+}
+
+/* Anteprima carta: usa FighterCard con bordo personalizzato via style prop */
+.skin-tile__preview--card {
+  width: 100%;
+  aspect-ratio: 250 / 340;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.skin-tile__preview--card .fighter-card {
+  width: 100%;
+  height: 100%;
+  border: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+/* Anteprima avatar: cerchio con anello gradiente */
+.skin-tile__preview--avatar {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.skin-avatar-ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(
+    --ring-gradient,
+    conic-gradient(from 0deg, var(--color-accent-highlight), var(--color-accent-link))
+  );
+  padding: 3px; /* spessore anello */
+}
+
+.skin-avatar-ring::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: var(--color-background-surface);
+  z-index: 1;
+}
+
+.skin-avatar-ring > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Stato attivo: bordo evidenziato */
+.skin-tile__preview.is-active {
+  outline: 2px solid var(--color-accent-highlight);
+  outline-offset: 2px;
+}
+
+.skin-tile__info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.skin-tile__name {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  text-transform: uppercase;
+}
+
+.skin-tile__description {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-body);
+}
+
+.skin-tile__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.skin-tile__buy:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ---------- Skin attive (strip) ---------- */
+.skin-active {
+  padding: var(--space-6);
+  border: 1px solid var(--color-border-default);
+  background: var(--color-background-surface-sunken);
+  border-radius: var(--radius-md);
+}
+
+.skin-active__strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.skin-active__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.skin-active__label {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-eyebrow);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.skin-active__preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  aspect-ratio: 250 / 340;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.skin-active__preview--avatar {
+  width: 60px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+
+.skin-active__preview .fighter-card {
+  width: 100%;
+  height: 100%;
+  border: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+.skin-active__name {
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (min-width: 64rem) {
+  .skin {
+    padding-block: var(--space-14) var(--space-24);
+  }
+
+  .skin-section__title {
+    font-size: var(--font-size-4xl);
+  }
+}

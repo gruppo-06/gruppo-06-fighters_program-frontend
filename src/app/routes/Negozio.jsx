@@ -1,6 +1,6 @@
 /** Negozio dei pacchetti (Figma: NEGOZIO). */
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import PackCard, { PackContents } from '../../components/PackCard.jsx';
 import Price from '../../components/Price.jsx';
@@ -144,6 +144,9 @@ export default function Negozio() {
         <div className="shop-header__title">
           <p className="eyebrow">Negozio</p>
           <h1>Apri. Scopri. Colleziona.</h1>
+          <Link to="/skin" className="button button--secondary shop-header__skin-link">
+            Skin
+          </Link>
         </div>
         <div className="shop-balance">
           <div>
